@@ -1,0 +1,2510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#F6F2E7">
+<title>董事长一年级 · 小学生创业模拟器</title>
+<style>
+/* ============ 基础变量 ============ */
+:root{
+  --paper:#F6F2E7;
+  --paper-2:#FBF8F0;
+  --ink:#15171C;
+  --ink-soft:#4A4E58;
+  --lime:#C6F73E;
+  --lime-deep:#A9E31C;
+  --blue:#7CD4FF;
+  --pink:#FFA6C9;
+  --orange:#FFB443;
+  --purple:#C4A9FF;
+  --red:#FF6B5A;
+  --white:#FFFDF7;
+  --shadow:5px 5px 0 var(--ink);
+  --shadow-sm:3px 3px 0 var(--ink);
+  --radius:16px;
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  font-family:var(--font);
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(rgba(21,23,28,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21,23,28,.045) 1px, transparent 1px);
+  background-size:24px 24px;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(circle at 50% 0%, transparent 40%, rgba(21,23,28,.05) 100%);
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+input{font-family:inherit;}
+h1,h2,h3,h4,p{margin:0;}
+::selection{background:var(--lime);color:var(--ink);}
+
+/* ============ 通用组件 ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 20px;border:2.5px solid var(--ink);border-radius:12px;
+  background:var(--white);color:var(--ink);font-weight:800;font-size:15px;
+  box-shadow:var(--shadow-sm);transition:transform .08s, box-shadow .08s, background .15s;
+  user-select:none;line-height:1;
+}
+.btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink);}
+.btn.lime{background:var(--lime);}
+.btn.blue{background:var(--blue);}
+.btn.pink{background:var(--pink);}
+.btn.orange{background:var(--orange);}
+.btn.dark{background:var(--ink);color:var(--white);}
+.btn.sm{padding:9px 14px;font-size:13px;border-radius:10px;box-shadow:2px 2px 0 var(--ink);}
+.btn.xs{padding:6px 10px;font-size:12px;border-radius:8px;box-shadow:2px 2px 0 var(--ink);border-width:2px;}
+.btn:disabled{opacity:.4;pointer-events:none;}
+.btn.wide{width:100%;}
+
+.card{
+  background:var(--white);border:2.5px solid var(--ink);border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+.tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:3px 8px;border:2px solid var(--ink);border-radius:999px;
+  font-size:11px;font-weight:800;background:var(--white);white-space:nowrap;
+}
+.sticker{
+  display:inline-block;padding:5px 12px;border:2.5px solid var(--ink);border-radius:8px;
+  background:var(--lime);font-weight:900;font-size:12px;letter-spacing:.5px;
+  box-shadow:2px 2px 0 var(--ink);transform:rotate(-2deg);
+}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
+.muted{color:var(--ink-soft);}
+.hl{background:linear-gradient(transparent 58%, var(--lime) 58%, var(--lime) 94%, transparent 94%);padding:0 2px;}
+
+/* ============ 屏幕 ============ */
+.screen{
+  display:none;position:relative;z-index:2;
+  min-height:100dvh;width:100%;
+}
+.screen.active{display:block;animation:screenIn .34s cubic-bezier(.2,.8,.2,1);}
+@keyframes screenIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.wrap{max-width:880px;margin:0 auto;padding:0 18px;}
+
+/* ============ 标题页 ============ */
+#s-title{padding:26px 0 40px;}
+#s-title.active{display:flex;flex-direction:column;justify-content:center;}
+.title-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px;}
+.brand{display:flex;align-items:center;gap:8px;font-weight:900;font-size:13px;letter-spacing:.5px;}
+.brand .dot{width:11px;height:11px;background:var(--ink);border-radius:2px;transform:rotate(45deg);}
+.license{
+  position:relative;background:var(--white);border:3px solid var(--ink);border-radius:20px;
+  box-shadow:8px 8px 0 var(--ink);padding:22px 22px 18px;overflow:hidden;
+}
+.license::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:9px;
+  background:repeating-linear-gradient(90deg,var(--lime) 0 18px,var(--ink) 18px 24px);
+}
+.license-stamp{
+  position:absolute;right:12px;top:26px;transform:rotate(14deg);
+  border:3px double var(--red);color:var(--red);border-radius:50%;
+  width:92px;height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:900;font-size:10px;line-height:1.25;text-align:center;opacity:.8;
+}
+.license-kicker{font-size:11px;font-weight:800;letter-spacing:3px;color:var(--ink-soft);margin:8px 0 6px;}
+.title-main{
+  font-size:clamp(44px,13vw,82px);line-height:.95;font-weight:900;letter-spacing:-2px;
+  margin:2px 0 4px;
+}
+.title-main .num{
+  display:inline-block;background:var(--lime);padding:0 10px 4px;border:3px solid var(--ink);
+  border-radius:14px;box-shadow:4px 4px 0 var(--ink);transform:rotate(-2deg);margin-top:8px;
+}
+.title-sub{font-size:14px;font-weight:700;color:var(--ink-soft);line-height:1.8;margin-top:14px;max-width:82%;}
+.license-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;padding-top:16px;
+  border-top:2px dashed rgba(21,23,28,.25);
+}
+.lg-item{font-size:12px;line-height:1.6;}
+.lg-item b{display:block;font-size:10px;letter-spacing:1px;color:var(--ink-soft);font-weight:800;margin-bottom:2px;}
+.pitch{
+  display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 20px;
+}
+.pitch .tag{font-size:12px;padding:6px 11px;box-shadow:2px 2px 0 var(--ink);}
+.title-actions{display:flex;flex-direction:column;gap:12px;}
+.title-actions .btn{padding:16px;font-size:16px;}
+.title-foot{margin-top:22px;font-size:11px;color:var(--ink-soft);line-height:1.9;text-align:center;}
+.float-emoji{
+  position:absolute;font-size:34px;opacity:.9;animation:bob 3.4s ease-in-out infinite;pointer-events:none;
+  filter:drop-shadow(2px 3px 0 rgba(21,23,28,.18));
+}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg);}50%{transform:translateY(-10px) rotate(6deg);}}
+
+/* ============ 创建公司 ============ */
+.sec-title{font-size:24px;font-weight:900;letter-spacing:-.5px;margin:6px 0 4px;}
+.sec-desc{font-size:13px;color:var(--ink-soft);line-height:1.75;margin-bottom:18px;}
+.step-badge{
+  display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;
+  letter-spacing:1px;color:var(--ink-soft);margin-bottom:10px;
+}
+.step-badge i{width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--lime);
+  display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;font-weight:800;margin-bottom:7px;letter-spacing:.5px;}
+.field input{
+  width:100%;padding:14px 15px;border:2.5px solid var(--ink);border-radius:12px;
+  background:var(--white);font-size:16px;font-weight:700;outline:none;box-shadow:var(--shadow-sm);
+  transition:box-shadow .12s, transform .12s;
+}
+.field input:focus{box-shadow:4px 4px 0 var(--lime);transform:translate(-1px,-1px);}
+.origin-grid{display:grid;gap:12px;}
+.origin-card{
+  display:flex;gap:13px;align-items:flex-start;text-align:left;padding:15px;
+  border:2.5px solid var(--ink);border-radius:14px;background:var(--white);
+  box-shadow:var(--shadow-sm);transition:.12s;
+}
+.origin-card:active{transform:translate(3px,3px);box-shadow:0 0 0;}
+.origin-card.sel{background:var(--lime);box-shadow:4px 4px 0 var(--ink);}
+.origin-card .oi{font-size:26px;line-height:1;}
+.origin-card h4{font-size:15px;font-weight:900;margin-bottom:3px;}
+.origin-card p{font-size:12px;line-height:1.6;color:var(--ink-soft);}
+.origin-card.sel p{color:#2a2d20;}
+.origin-bonus{font-size:11px;font-weight:800;margin-top:6px;display:inline-block;border-bottom:2px solid var(--ink);}
+
+/* ============ 招聘 ============ */
+.hire-hint{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--ink);color:var(--white);border-radius:12px;padding:11px 14px;margin-bottom:16px;
+  font-size:12px;font-weight:700;
+}
+.hire-hint b{color:var(--lime);font-size:15px;font-family:var(--mono);}
+.hire-grid{display:grid;gap:13px;}
+.mate-card{
+  position:relative;padding:15px;border:2.5px solid var(--ink);border-radius:16px;background:var(--white);
+  box-shadow:var(--shadow-sm);transition:.14s;text-align:left;width:100%;
+}
+.mate-card.sel{background:#EFFFCB;box-shadow:4px 4px 0 var(--ink);transform:translateY(-2px);}
+.mate-card.sel::after{
+  content:"已签约 ✓";position:absolute;top:-11px;right:12px;background:var(--lime);
+  border:2px solid var(--ink);border-radius:999px;font-size:11px;font-weight:900;padding:3px 9px;
+  transform:rotate(2deg);
+}
+.mate-top{display:flex;gap:12px;align-items:center;}
+.avatar{
+  width:52px;height:52px;border-radius:14px;border:2.5px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:26px;flex:0 0 auto;
+  box-shadow:2px 2px 0 var(--ink);
+}
+.mate-name{font-size:16px;font-weight:900;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.mate-role{font-size:11px;color:var(--ink-soft);font-weight:700;margin-top:2px;}
+.mate-quote{font-size:12px;line-height:1.65;margin-top:10px;padding-left:10px;border-left:3px solid var(--lime);}
+.skill-row{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap;}
+.skill-pill{font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;background:var(--paper);border:1.5px solid rgba(21,23,28,.18);}
+.skill-pill b{font-family:var(--mono);}
+.need-line{font-size:11px;font-weight:700;margin-top:9px;color:var(--ink-soft);}
+.need-line b{color:var(--ink);}
+
+/* ============ 游戏主界面 ============ */
+.hud{
+  position:sticky;top:0;z-index:40;background:rgba(246,242,231,.94);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:2.5px solid var(--ink);padding:9px 0 8px;
+}
+.hud-line{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.week-chip{
+  display:flex;align-items:center;gap:7px;background:var(--ink);color:var(--white);
+  padding:6px 11px;border-radius:9px;font-weight:900;font-size:12px;letter-spacing:.5px;
+}
+.week-chip b{color:var(--lime);font-family:var(--mono);font-size:14px;}
+.hud-company{
+  font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:38vw;color:var(--ink-soft);
+}
+.icon-btn{
+  width:32px;height:32px;border:2px solid var(--ink);border-radius:9px;background:var(--white);
+  display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:2px 2px 0 var(--ink);
+  flex:0 0 auto;
+}
+.icon-btn:active{transform:translate(2px,2px);box-shadow:none;}
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;}
+.stat{
+  position:relative;background:var(--white);border:2px solid var(--ink);border-radius:9px;
+  padding:5px 4px 6px;text-align:center;overflow:hidden;
+}
+.stat .sl{font-size:9px;font-weight:800;color:var(--ink-soft);letter-spacing:.2px;display:block;line-height:1.2;white-space:nowrap;overflow:hidden;}
+.stat .sv{font-family:var(--mono);font-weight:900;font-size:14px;line-height:1.15;display:block;margin-top:1px;}
+.stat .sbar{position:absolute;left:0;bottom:0;height:3px;background:var(--ink);transition:width .5s;}
+.stat.cash .sbar{background:var(--lime-deep);}
+.stat.users .sbar{background:var(--blue);}
+.stat.rep .sbar{background:var(--orange);}
+.stat.morale .sbar{background:var(--pink);}
+.stat.grade .sbar{background:var(--purple);}
+.stat.parent .sbar{background:var(--red);}
+.stat.pop{animation:pop .34s;}
+@keyframes pop{50%{transform:scale(1.12);}}
+
+#tabBody{padding:16px 0 130px;}
+.tab-pane{animation:fadeUp .26s;} 
+@keyframes fadeUp{from{opacity:0;transform:translateY(9px);}to{opacity:1;transform:none;}}
+
+.panel{
+  background:var(--white);border:2.5px solid var(--ink);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:15px;margin-bottom:15px;
+}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
+.panel-title{font-size:15px;font-weight:900;display:flex;align-items:center;gap:7px;}
+.panel-title .pi{font-size:17px;}
+.panel-sub{font-size:11px;color:var(--ink-soft);font-weight:700;}
+
+/* 产品页 */
+.product-layout{display:grid;gap:16px;}
+@media(min-width:700px){.product-layout{grid-template-columns:225px 1fr;align-items:start;}}
+.phone{
+  width:196px;margin:0 auto;background:var(--ink);border-radius:26px;padding:7px;
+  box-shadow:6px 6px 0 rgba(21,23,28,.28);position:relative;
+}
+.phone-notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:52px;height:5px;background:#000;border-radius:99px;z-index:3;opacity:.55;}
+.phone-screen{background:#FCFBF4;border-radius:20px;overflow:hidden;min-height:300px;display:flex;flex-direction:column;}
+.app-top{padding:20px 11px 10px;background:var(--lime);border-bottom:2px solid var(--ink);}
+.app-logo{font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.app-sub{font-size:8px;font-weight:700;opacity:.65;margin-top:1px;}
+.app-mods{flex:1;padding:7px 8px;display:flex;flex-direction:column;gap:5px;}
+.app-mod{
+  display:flex;align-items:center;gap:6px;padding:6px 7px;background:var(--white);
+  border:1.5px solid rgba(21,23,28,.85);border-radius:7px;font-size:9.5px;font-weight:800;
+}
+.app-mod .am-i{font-size:12px;}
+.app-mod .am-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.app-empty{font-size:9px;color:#999;text-align:center;padding:22px 6px;line-height:1.7;}
+.app-tabbar{display:flex;border-top:1.5px solid rgba(21,23,28,.8);background:var(--white);padding:5px 0;}
+.app-tabbar div{flex:1;text-align:center;font-size:9px;font-weight:800;opacity:.5;}
+.app-tabbar div.on{opacity:1;color:#000;}
+.price-badge{
+  position:absolute;top:44px;right:-8px;background:var(--pink);border:2px solid var(--ink);
+  border-radius:8px;font-size:9px;font-weight:900;padding:3px 7px;transform:rotate(6deg);
+  box-shadow:2px 2px 0 var(--ink);z-index:3;
+}
+.power-box{display:flex;align-items:center;gap:11px;margin-bottom:13px;}
+.power-num{font-family:var(--mono);font-size:34px;font-weight:900;line-height:1;}
+.power-meta{flex:1;}
+.power-label{font-size:10px;font-weight:800;color:var(--ink-soft);margin-bottom:5px;letter-spacing:.5px;}
+.power-track{height:11px;border:2px solid var(--ink);border-radius:99px;background:var(--paper);overflow:hidden;}
+.power-fill{height:100%;background:repeating-linear-gradient(45deg,var(--lime) 0 7px,var(--lime-deep) 7px 14px);transition:width .5s cubic-bezier(.2,.9,.2,1);}
+.syn-list{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+.syn{
+  display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;
+  background:#F1FFD4;border:2px solid var(--ink);border-radius:8px;padding:6px 9px;
+}
+.syn.neg{background:#FFE1DC;}
+.mod-grid{display:grid;gap:10px;}
+.mod-card{
+  border:2.5px solid var(--ink);border-radius:13px;background:var(--white);padding:12px;
+  box-shadow:3px 3px 0 var(--ink);position:relative;
+}
+.mod-card.on{background:#F7FFE4;}
+.mod-card.danger{background:#FFF3F0;}
+.mod-head{display:flex;align-items:center;gap:9px;}
+.mod-emoji{font-size:22px;line-height:1;}
+.mod-title{font-size:14px;font-weight:900;line-height:1.2;}
+.mod-cat{font-size:10px;font-weight:800;color:var(--ink-soft);}
+.mod-power{margin-left:auto;font-family:var(--mono);font-weight:900;font-size:15px;background:var(--lime);border:2px solid var(--ink);border-radius:7px;padding:2px 7px;}
+.mod-desc{font-size:11px;color:var(--ink-soft);line-height:1.6;margin:7px 0 8px;}
+.mod-cost{display:flex;flex-wrap:wrap;gap:5px;font-size:10px;font-weight:800;margin-bottom:9px;}
+.cost-pill{background:var(--paper);border:1.5px solid rgba(21,23,28,.2);border-radius:6px;padding:2px 6px;}
+.mod-actions{display:flex;gap:7px;align-items:center;}
+.installed-row{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;border:2px solid var(--ink);
+  border-radius:10px;background:var(--white);margin-bottom:7px;font-size:12px;font-weight:800;
+}
+.installed-row .ir-x{margin-left:auto;width:24px;height:24px;border:2px solid var(--ink);border-radius:6px;font-size:12px;line-height:1;background:var(--white);}
+.empty-note{font-size:11.5px;color:var(--ink-soft);text-align:center;padding:16px;line-height:1.8;border:2px dashed rgba(21,23,28,.25);border-radius:12px;}
+
+/* 市场页 */
+.price-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.price-card{
+  text-align:left;padding:11px;border:2.5px solid var(--ink);border-radius:12px;background:var(--white);
+  box-shadow:3px 3px 0 var(--ink);transition:.12s;
+}
+.price-card.sel{background:var(--lime);transform:translateY(-2px);}
+.price-card .pc-top{display:flex;align-items:center;gap:6px;font-weight:900;font-size:12.5px;}
+.price-card .pc-amt{font-family:var(--mono);font-size:17px;font-weight:900;margin:5px 0 2px;}
+.price-card .pc-desc{font-size:10px;line-height:1.5;color:var(--ink-soft);}
+.price-card.sel .pc-desc{color:#2a2d20;}
+.price-card .pc-rev{font-size:10px;font-weight:900;margin-top:6px;border-top:1.5px dashed rgba(21,23,28,.3);padding-top:5px;}
+.chan-row{
+  display:flex;align-items:center;gap:10px;padding:11px;border:2.5px solid var(--ink);
+  border-radius:12px;background:var(--white);margin-bottom:9px;transition:.12s;
+}
+.chan-row.sel{background:#EAF8FF;box-shadow:3px 3px 0 var(--ink);}
+.chan-row.locked{opacity:.85;background:#FAF7EE;}
+.chan-emoji{font-size:22px;}
+.chan-main{flex:1;min-width:0;}
+.chan-name{font-size:13px;font-weight:900;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.chan-meta{font-size:10.5px;color:var(--ink-soft);font-weight:700;margin-top:3px;}
+.risk-dots{display:inline-flex;gap:2px;vertical-align:middle;}
+.risk-dots i{width:6px;height:6px;border-radius:50%;background:rgba(21,23,28,.15);display:block;}
+.risk-dots i.on{background:var(--red);}
+.forecast-box{
+  border:2.5px dashed var(--ink);border-radius:12px;padding:11px;background:#FFFCEB;
+  font-size:12px;line-height:1.9;
+}
+.forecast-box b{font-family:var(--mono);font-size:13px;}
+
+/* 团队页 */
+.member-card{
+  border:2.5px solid var(--ink);border-radius:14px;background:var(--white);padding:12px;
+  box-shadow:3px 3px 0 var(--ink);margin-bottom:11px;
+}
+.member-top{display:flex;gap:10px;align-items:center;}
+.member-info{flex:1;min-width:0;}
+.loyalty-wrap{margin-top:9px;}
+.loyalty-label{display:flex;justify-content:space-between;font-size:10px;font-weight:800;color:var(--ink-soft);margin-bottom:3px;}
+.loyalty-track{height:8px;border:2px solid var(--ink);border-radius:99px;background:var(--paper);overflow:hidden;}
+.loyalty-fill{height:100%;background:var(--pink);transition:width .4s;}
+.member-say{
+  font-size:11px;line-height:1.6;background:var(--paper);border-radius:9px;padding:7px 9px;margin-top:9px;
+  border-left:3px solid var(--purple);
+}
+.member-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;}
+.need-chip{font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;border:1.5px solid var(--ink);}
+.need-chip.ok{background:#E8FFC9;}
+.need-chip.no{background:#FFE3DD;}
+.team-note{font-size:11px;line-height:1.7;color:var(--ink-soft);text-align:center;padding:8px;}
+
+/* 计划页 */
+.block-row{
+  display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:2px dashed rgba(21,23,28,.16);
+}
+.block-row:last-child{border-bottom:none;}
+.block-ico{width:38px;height:38px;border-radius:11px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto;box-shadow:2px 2px 0 var(--ink);}
+.block-main{flex:1;min-width:0;}
+.block-name{font-size:13px;font-weight:900;}
+.block-desc{font-size:10px;color:var(--ink-soft);font-weight:700;margin-top:1px;}
+.stepper{display:flex;align-items:center;gap:7px;flex:0 0 auto;}
+.stepper button{
+  width:29px;height:29px;border:2.2px solid var(--ink);border-radius:8px;background:var(--white);
+  font-size:16px;font-weight:900;line-height:1;box-shadow:2px 2px 0 var(--ink);display:flex;align-items:center;justify-content:center;
+}
+.stepper button:active{transform:translate(2px,2px);box-shadow:none;}
+.stepper button:disabled{opacity:.3;pointer-events:none;}
+.stepper .cnt{font-family:var(--mono);font-size:19px;font-weight:900;min-width:16px;text-align:center;}
+.block-cast{font-size:10px;font-weight:900;min-width:64px;text-align:right;color:var(--ink-soft);}
+.blocks-left{
+  display:flex;align-items:center;justify-content:space-between;margin:12px 0 4px;
+  font-size:12px;font-weight:800;
+}
+.blocks-dots{display:flex;gap:5px;}
+.blocks-dots i{width:15px;height:15px;border-radius:5px;border:2px solid var(--ink);background:var(--white);display:block;}
+.blocks-dots i.on{background:var(--lime);}
+.log-item{display:flex;gap:8px;font-size:11.5px;line-height:1.65;padding:7px 0;border-bottom:1px dashed rgba(21,23,28,.14);}
+.log-item .lw{font-family:var(--mono);font-weight:900;color:var(--ink-soft);flex:0 0 auto;}
+
+/* 底部 */
+.bottombar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:rgba(246,242,231,.97);backdrop-filter:blur(12px);border-top:2.5px solid var(--ink);
+  padding:8px 0 calc(7px + env(safe-area-inset-bottom));
+}
+.bottombar .wrap{padding:0 12px;}
+.end-btn{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:11px 15px;border:2.5px solid var(--ink);border-radius:11px;background:var(--lime);
+  font-weight:900;font-size:14px;box-shadow:3px 3px 0 var(--ink);margin-bottom:8px;
+  transition:transform .08s, box-shadow .08s;
+}
+.end-btn:active{transform:translate(3px,3px);box-shadow:0 0 0;}
+.end-btn .eb-r{font-size:10.5px;font-weight:800;opacity:.7;display:flex;align-items:center;gap:5px;}
+.end-btn.ready{animation:glow 1.9s ease-in-out infinite;}
+@keyframes glow{0%,100%{box-shadow:3px 3px 0 var(--ink);}50%{box-shadow:3px 3px 0 var(--ink),0 0 0 4px rgba(198,247,62,.55);}}
+.tabbar{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.tab-item{
+  display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;
+  border:2px solid transparent;border-radius:10px;font-size:9.5px;font-weight:800;color:var(--ink-soft);
+  transition:.12s;
+}
+.tab-item .ti{font-size:17px;line-height:1;filter:grayscale(1);opacity:.55;transition:.15s;}
+.tab-item.on{background:var(--ink);color:var(--white);border-color:var(--ink);}
+.tab-item.on .ti{filter:none;opacity:1;}
+
+/* ============ 弹窗 ============ */
+.modal-mask{
+  position:fixed;inset:0;z-index:100;background:rgba(21,23,28,.5);backdrop-filter:blur(3px);
+  display:flex;align-items:flex-end;justify-content:center;padding:0;
+  animation:maskIn .2s;
+}
+@media(min-width:700px){.modal-mask{align-items:center;padding:24px;}}
+@keyframes maskIn{from{opacity:0}to{opacity:1}}
+.modal{
+  background:var(--paper-2);border:3px solid var(--ink);border-radius:22px 22px 0 0;
+  width:100%;max-width:520px;max-height:92dvh;overflow-y:auto;
+  animation:sheetUp .32s cubic-bezier(.2,.9,.2,1);position:relative;
+  box-shadow:0 -8px 0 rgba(21,23,28,.15);
+}
+@media(min-width:700px){.modal{border-radius:22px;box-shadow:8px 8px 0 var(--ink);animation:modalIn .3s cubic-bezier(.2,.9,.2,1);}}
+@keyframes sheetUp{from{transform:translateY(100%);}to{transform:none;}}
+@keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(14px);}to{opacity:1;transform:none;}}
+.modal-stripe{height:8px;background:repeating-linear-gradient(90deg,var(--lime) 0 16px,var(--ink) 16px 22px);border-radius:18px 18px 0 0;}
+.modal-body{padding:18px 18px calc(20px + env(safe-area-inset-bottom));}
+.modal-close{
+  position:absolute;top:15px;right:15px;width:30px;height:30px;border:2px solid var(--ink);
+  border-radius:8px;background:var(--white);font-size:14px;font-weight:900;display:flex;
+  align-items:center;justify-content:center;box-shadow:2px 2px 0 var(--ink);z-index:2;
+}
+.event-emoji{
+  font-size:46px;line-height:1;display:inline-block;margin-bottom:8px;
+  animation:pop .5s;
+}
+.event-kicker{font-size:10px;font-weight:900;letter-spacing:2px;color:var(--red);margin-bottom:5px;}
+.event-title{font-size:21px;font-weight:900;letter-spacing:-.5px;line-height:1.3;margin-bottom:8px;}
+.event-desc{font-size:13px;line-height:1.85;color:var(--ink-soft);margin-bottom:15px;}
+.choice{
+  display:block;width:100%;text-align:left;padding:13px;border:2.5px solid var(--ink);
+  border-radius:12px;background:var(--white);box-shadow:3px 3px 0 var(--ink);margin-bottom:9px;
+  transition:.1s;
+}
+.choice:active{transform:translate(3px,3px);box-shadow:none;}
+.choice .ch-label{font-size:13.5px;font-weight:900;letter-spacing:-.2px;}
+.choice .ch-hint{font-size:10.5px;color:var(--ink-soft);margin-top:4px;line-height:1.5;font-weight:700;}
+.choice.risk{background:#FFF4F1;}
+.choice.good{background:#F5FFE2;}
+
+/* 周报 */
+.report-week{font-family:var(--mono);font-size:12px;font-weight:900;letter-spacing:1px;color:var(--ink-soft);}
+.report-title{font-size:24px;font-weight:900;margin:3px 0 14px;letter-spacing:-.5px;}
+.delta-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px;}
+.delta{
+  display:flex;align-items:center;justify-content:space-between;padding:9px 11px;
+  border:2px solid var(--ink);border-radius:10px;background:var(--white);font-size:11px;font-weight:800;
+}
+.delta .dv{font-family:var(--mono);font-size:13px;font-weight:900;}
+.up{color:#2E8B2E;}
+.down{color:var(--red);}
+.flat{color:var(--ink-soft);}
+.diary{
+  background:var(--white);border:2px solid var(--ink);border-left:5px solid var(--lime);
+  border-radius:10px;padding:12px 13px;font-size:12px;line-height:1.9;margin-bottom:14px;
+}
+.diary b{font-weight:900;}
+.diary .sig{display:block;margin-top:7px;font-size:10px;color:var(--ink-soft);font-weight:700;text-align:right;}
+
+/* 董事会 */
+.board-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.board-title{font-size:19px;font-weight:900;letter-spacing:-.4px;line-height:1.35;}
+.board-sub{font-size:11px;color:var(--ink-soft);line-height:1.7;margin:6px 0 13px;}
+.vote-row{
+  display:flex;align-items:flex-start;gap:9px;padding:10px;border:2px solid var(--ink);
+  border-radius:11px;background:var(--white);margin-bottom:8px;position:relative;
+}
+.vote-row .vquote{font-size:11px;line-height:1.6;margin-top:4px;color:var(--ink-soft);}
+.vote-badge{
+  font-size:10px;font-weight:900;padding:2px 7px;border-radius:6px;border:2px solid var(--ink);
+  white-space:nowrap;margin-left:auto;
+}
+.vote-badge.a{background:var(--lime);}
+.vote-badge.b{background:var(--blue);}
+.vote-row.flipped{background:#F1FFD4;}
+.flip-btn{font-size:10px;font-weight:900;padding:4px 8px;border:2px solid var(--ink);border-radius:7px;background:var(--orange);box-shadow:2px 2px 0 var(--ink);margin-top:6px;}
+.stance-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:13px 0 10px;}
+.stance{
+  padding:11px;border:2.5px solid var(--ink);border-radius:11px;background:var(--white);
+  font-size:12px;font-weight:900;text-align:center;box-shadow:2px 2px 0 var(--ink);line-height:1.4;
+}
+.stance.sel{background:var(--lime);}
+.tally{display:flex;justify-content:center;gap:14px;margin:12px 0;font-family:var(--mono);font-size:26px;font-weight:900;}
+.tally span{font-size:12px;font-family:var(--font);display:block;text-align:center;color:var(--ink-soft);margin-top:2px;}
+
+/* 结局 */
+.end-hero{text-align:center;padding:8px 0 6px;}
+.end-emoji{font-size:64px;line-height:1;display:inline-block;animation:pop .7s;}
+.end-kicker{font-size:10px;letter-spacing:3px;font-weight:900;color:var(--ink-soft);margin:10px 0 4px;}
+.end-title{font-size:29px;font-weight:900;letter-spacing:-1px;line-height:1.2;margin-bottom:8px;}
+.end-desc{font-size:12.5px;line-height:1.9;color:var(--ink-soft);text-align:left;margin:12px 0;}
+.end-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:14px 0;}
+.end-stat{background:var(--white);border:2px solid var(--ink);border-radius:10px;padding:8px 5px;text-align:center;}
+.end-stat .es-v{font-family:var(--mono);font-size:17px;font-weight:900;display:block;}
+.end-stat .es-l{font-size:9px;font-weight:800;color:var(--ink-soft);}
+.badge-grid{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 14px;}
+.badge{font-size:10.5px;font-weight:900;padding:5px 9px;border:2px solid var(--ink);border-radius:999px;background:var(--lime);}
+.badge.off{background:var(--paper);opacity:.35;}
+
+/* Toast */
+#toastRoot{position:fixed;left:0;right:0;bottom:135px;z-index:200;display:flex;flex-direction:column;align-items:center;gap:7px;pointer-events:none;padding:0 16px;}
+.toast{
+  background:var(--ink);color:var(--white);font-size:12.5px;font-weight:800;padding:10px 16px;
+  border-radius:999px;border:2px solid var(--white);box-shadow:3px 3px 0 rgba(21,23,28,.4);
+  animation:toastIn .26s cubic-bezier(.2,.9,.2,1);max-width:92%;
+}
+.toast.good{background:var(--ink);color:var(--lime);}
+.toast.bad{background:var(--red);color:#fff;}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.94);}to{opacity:1;transform:none;}}
+
+/* 打赏/撒花 */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden;}
+.confetti i{position:absolute;width:9px;height:14px;opacity:.95;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);}}
+
+/* 帮助 */
+.help-h{font-size:15px;font-weight:900;margin:16px 0 6px;display:flex;align-items:center;gap:6px;}
+.help-h:first-child{margin-top:0;}
+.help-p{font-size:12px;line-height:1.9;color:var(--ink-soft);}
+.help-p b{color:var(--ink);}
+.help-list{margin:6px 0 0;padding-left:17px;font-size:12px;line-height:1.95;color:var(--ink-soft);}
+.help-list b{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<!-- ========== 标题页 ========== -->
+<section class="screen active" id="s-title">
+  <div class="wrap">
+    <div class="title-top">
+      <div class="brand"><span class="dot"></span>TRAE 好应用大赏 · 参赛作品</div>
+      <div class="tag">适合 8–13 岁</div>
+    </div>
+
+    <div class="license">
+      <div class="license-stamp">校园<br>创业<br>认证</div>
+      <div class="license-kicker">营 业 执 照 / No.001</div>
+      <h1 class="title-main">董事长<br><span class="num">一年级</span></h1>
+      <p class="title-sub">你是一个四年级学生。<br>你决定开一家公司，卖的不是文具，是「让学习变好玩」。</p>
+      <div class="license-grid">
+        <div class="lg-item"><b>经营者</b>你（四年级）</div>
+        <div class="lg-item"><b>注册资本</b>¥120（压岁钱）</div>
+        <div class="lg-item"><b>经营范围</b>学习软件 · 校园服务</div>
+        <div class="lg-item"><b>经营期限</b>8 个星期</div>
+      </div>
+    </div>
+
+    <div class="pitch">
+      <span class="tag">🧠 真商业决策</span>
+      <span class="tag">🗳️ 团队投票博弈</span>
+      <span class="tag">⚡ 突发事件</span>
+      <span class="tag">🛠️ 拼装产品</span>
+    </div>
+
+    <div class="title-actions">
+      <button class="btn lime" onclick="startNew()">开公司，当董事长 →</button>
+      <button class="btn" id="continueBtn" style="display:none" onclick="continueGame()">继续上没开完的会</button>
+      <button class="btn" onclick="openHelp()">先看看怎么玩</button>
+    </div>
+
+    <p class="title-foot">
+      不是点点点就赢的模拟经营。<br>
+      每个星期你只有 4 个时间块，每一次取舍都会有人不满意。
+    </p>
+  </div>
+</section>
+
+<!-- ========== 创建公司 ========== -->
+<section class="screen" id="s-setup">
+  <div class="wrap" style="padding-top:28px;padding-bottom:40px">
+    <div class="step-badge"><i>1</i> 注册你的公司</div>
+    <h2 class="sec-title">先起个名字吧</h2>
+    <p class="sec-desc">这个名字会印在营业执照上，也会出现在同学的手机里。</p>
+
+    <div class="field">
+      <label>你的名字（董事长）</label>
+      <input id="inpCeo" maxlength="8" placeholder="比如：李小乐" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>公司名字</label>
+      <input id="inpCompany" maxlength="10" placeholder="比如：小乐学习社" autocomplete="off">
+    </div>
+
+    <div class="step-badge" style="margin-top:22px"><i>2</i> 你为什么开这家公司</div>
+    <h2 class="sec-title" style="font-size:19px;margin-bottom:6px">选一个初心，它会一直影响你</h2>
+    <p class="sec-desc" style="margin-bottom:14px">没有标准答案。但遇到事情的时候，你会想起它。</p>
+    <div class="origin-grid" id="originGrid"></div>
+
+    <div style="margin-top:24px">
+      <button class="btn lime wide" onclick="gotoHire()">下一步：招人 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 招聘 ========== -->
+<section class="screen" id="s-hire">
+  <div class="wrap" style="padding-top:28px;padding-bottom:40px">
+    <div class="step-badge"><i>3</i> 组建创始团队</div>
+    <h2 class="sec-title">公司不能只有你一个人</h2>
+    <p class="sec-desc">从 5 个同学里选 <b>3 个</b>。每人每周工资 ¥4，他们也有自己的小算盘。</p>
+    <div class="hire-hint">
+      <span>已签约 <b id="hireCount">0</b> / 3</span>
+      <span style="opacity:.75">选中的同学会记住：是你给了他机会</span>
+    </div>
+    <div class="hire-grid" id="hireGrid"></div>
+    <div style="margin-top:20px">
+      <button class="btn lime wide" id="hireBtn" disabled onclick="finishHire()">签下他们，开始第一周 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 主游戏 ========== -->
+<section class="screen" id="s-game">
+  <header class="hud">
+    <div class="wrap">
+      <div class="hud-line">
+        <div class="week-chip">WEEK <b id="hudWeek">01</b> <span style="opacity:.55">/ 08</span></div>
+        <div class="hud-company" id="hudCompany">—</div>
+        <div style="display:flex;gap:5px">
+          <button class="icon-btn" onclick="toggleSound()" id="soundBtn" title="音效">🔊</button>
+          <button class="icon-btn" onclick="openHelp()" title="帮助">?</button>
+        </div>
+      </div>
+      <div class="stat-grid" id="statGrid"></div>
+    </div>
+  </header>
+  <div class="wrap"><div id="tabBody"></div></div>
+</section>
+
+<div class="bottombar" id="bottombar" style="display:none">
+  <div class="wrap">
+    <button class="end-btn" id="endWeekBtn" onclick="endWeek()">
+      <span>结束本周 →</span>
+      <span class="eb-r" id="endWeekHint">研发 1 · 推广 1 · 团队 1 · 学习 1</span>
+    </button>
+    <nav class="tabbar" id="tabbar">
+      <button class="tab-item on" data-tab="product"><span class="ti">🛠️</span>产品</button>
+      <button class="tab-item" data-tab="market"><span class="ti">🏪</span>市场</button>
+      <button class="tab-item" data-tab="team"><span class="ti">🧑‍🤝‍🧑</span>团队</button>
+      <button class="tab-item" data-tab="plan"><span class="ti">🗓️</span>计划</button>
+    </nav>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+/* =========================================================
+   董事长一年级 —— 数据层
+   ========================================================= */
+
+const MODULES = [
+  {id:'wrongbook', name:'错题本 2.0', emoji:'📕', cat:'学习', power:14, cost:10, cash:10, upkeep:1,
+   desc:'把错题拍下来，自动分类，考前只看自己错过的。'},
+  {id:'math', name:'口算闯关', emoji:'⚡', cat:'学习', power:18, cost:16, cash:12, upkeep:2,
+   desc:'60 秒限时口算，算完就能看到全班排名。'},
+  {id:'words', name:'背单词打卡', emoji:'🔤', cat:'学习', power:22, cost:20, cash:16, upkeep:2,
+   desc:'每天 10 个单词，连续打卡有勋章。'},
+  {id:'rank', name:'班级积分榜', emoji:'🏆', cat:'社交', power:20, cost:22, cash:10, upkeep:3,
+   desc:'谁学习谁上榜。一旦开始卷，就停不下来了。'},
+  {id:'group', name:'学习小组', emoji:'👥', cat:'社交', power:15, cost:18, cash:8, upkeep:2,
+   desc:'4 人一组，互相监督，谁不写作业全组知道。'},
+  {id:'skin', name:'可爱皮肤包', emoji:'🎀', cat:'体验', power:12, cost:12, cash:20, upkeep:0,
+   desc:'猫猫主题的按钮和音效。功能没变，但同学就是喜欢。'},
+  {id:'report', name:'家长日报', emoji:'📨', cat:'家长', power:9, cost:24, cash:6, upkeep:1,
+   desc:'每天给爸妈发一条好消息，家长满意度稳步上升。'},
+  {id:'ai', name:'AI 讲题', emoji:'🤖', cat:'学习', power:34, cost:34, cash:40, upkeep:5,
+   desc:'不会的题，一步一步讲到你懂。研发很贵。'},
+  {id:'voice', name:'语音点名', emoji:'🎤', cat:'社交', power:16, cost:14, cash:6, upkeep:1,
+   desc:'上课偷偷签到，刺激。老师发现会有点麻烦。'},
+  {id:'cheat', name:'一键抄作业', emoji:'😈', cat:'危险', power:42, cost:6, cash:0, upkeep:6,
+   desc:'用户会暴涨。但李老师不是傻子。', danger:true}
+];
+
+const SYNERGIES = [
+  {has:['wrongbook','math'], bonus:10, text:'错题 + 口算 = 提分闭环'},
+  {has:['words','rank'], bonus:12, text:'打卡 + 榜单 = 停不下来'},
+  {has:['group','rank'], bonus:8, text:'小组 + 榜单 = 全组内卷'},
+  {has:['report','ai'], bonus:8, text:'AI + 家长日报 = 家长放心'},
+  {has:['skin','wrongbook'], bonus:5, text:'好看的错题本也是错题本'},
+  {has:['skin','words'], bonus:5, text:'好看的打卡才想打卡'},
+  {has:['cheat','report'], bonus:-25, text:'抄作业 + 家长日报 = 精神分裂'},
+  {has:['cheat','ai'], bonus:-10, text:'都有 AI，一个讲题一个抄题'}
+];
+
+const CHANNELS = [
+  {id:'class', name:'班级群', emoji:'💬', cost:0, reach:70, risk:0,
+   desc:'在班级群里发个链接，全班都能看到。'},
+  {id:'grade', name:'年级海报', emoji:'🖨️', cost:15, reach:220, risk:1,
+   desc:'印 40 张海报贴满楼道。花点钱，人也更多。'},
+  {id:'parents', name:'家长群', emoji:'👨‍👩‍👧', cost:25, reach:340, risk:2,
+   desc:'让爸妈帮忙转发。传播快，但家长会开始研究你。'},
+  {id:'gate', name:'校门口摆摊', emoji:'🏪', cost:40, reach:520, risk:3,
+   desc:'放学时摆个摊扫码送贴纸。人最多，也最容易被老师看见。'},
+  {id:'radio', name:'校园广播', emoji:'📢', cost:60, reach:820, risk:1,
+   desc:'花 60 块赞助一次广播。全校都听见你的广告。'}
+];
+
+const PRICES = {
+  free:   {id:'free',   name:'完全免费',  icon:'🎁', amount:0, rate:0,    rep:0,
+           desc:'同学都爱，但一分钱也赚不到。'},
+  once:   {id:'once',   name:'1 元买断', icon:'🪙', amount:1, rate:0.30, rep:-2,
+           desc:'一根辣条的钱，一次付清。'},
+  member: {id:'member', name:'3 元/月会员', icon:'💳', amount:3, rate:0.10, rep:-4,
+           desc:'每月 3 元解锁全部功能。稳定，但会被说贵。'},
+  parent: {id:'parent', name:'6 元家长版', icon:'👨‍👩‍👦', amount:6, rate:0.05, rep:-3,
+           desc:'家长买单，同学免费用。家长满意，但同学嫌你烦。'}
+};
+
+const CANDIDATES = [
+  {id:'wang', name:'王小胖', emoji:'🧑‍💻', role:'技术总监', bg:'#D9F3FF',
+   quote:'“服务器又崩了？重启一下就好。”（他已经重启了三次）',
+   tech:5, design:1, net:2, trait:'摸鱼型',
+   traitDesc:'每 4 个研发块，可能有 1 块被他用来偷偷看漫画。',
+   need:'零食补贴', needDesc:'只要公司账上有钱，他就觉得公司有前途。',
+   color:'#7CD4FF',
+   opinion:{price:'A', cheat:'A', expo:'A'},
+   say:{price:'收费吧，我算了，一个班 60 人，收 1 块就是 60 块。',
+        cheat:'抄作业是刚需啊老大，这功能一上，用户翻三倍。',
+        expo:'展台必须搞，我要站在最中间那种。'}},
+  {id:'mei', name:'林小美', emoji:'🎨', role:'设计总监', bg:'#FFE3EF',
+   quote:'“能不能在关于页面写我的名字……就小小一行。”',
+   tech:2, design:5, net:2, trait:'社恐型',
+   traitDesc:'产品颜值高，但人一多就想请假。',
+   need:'署名权', needDesc:'她想要的不是钱，是在产品里留下自己的名字。',
+   color:'#FFA6C9',
+   opinion:{price:'B', cheat:'B', expo:'A'},
+   say:{price:'免费吧。收了钱，同学会在背后说我们的。',
+        cheat:'不要。做完这个，我们在走廊上会抬不起头。',
+        expo:'我想做那个展台。给我一张桌子，我能做得很漂亮。'}},
+  {id:'zhuang', name:'张大壮', emoji:'📣', role:'市场总监', bg:'#FFE9C9',
+   quote:'“隔壁班已经在抄我们了。干他！”',
+   tech:1, design:2, net:5, trait:'好胜型',
+   traitDesc:'推广效率高；但口碑下滑时，他会第一个抱怨。',
+   need:'副董事长职位', needDesc:'他想要一个名头，站在校门口说这句话更好用。',
+   color:'#FFB443',
+   opinion:{price:'A', cheat:'A', expo:'A'},
+   say:{price:'必须收，不收钱的公司叫兴趣小组。',
+        cheat:'加！隔壁班都加到第三个功能了，我们还在这儿讲原则？',
+        expo:'展台交给我，我能拉来半个年级。'}},
+  {id:'xing', name:'陈小星', emoji:'📚', role:'学习委员', bg:'#E5DCFF',
+   quote:'“我算过了，我们这周会考砸。”',
+   tech:3, design:2, net:3, trait:'严谨型',
+   traitDesc:'每周自动帮你维护一点点成绩，但他盯得很紧。',
+   need:'保证不影响学习', needDesc:'成绩低于 75，他会开始怀疑这家公司。',
+   color:'#C4A9FF',
+   opinion:{price:'B', cheat:'B', expo:'B'},
+   say:{price:'先别收。我们连资格证都没有，收钱性质就变了。',
+        cheat:'你要是上这个，我第一个退出。',
+        expo:'科技节那天是数学单元测，你选一个。'}},
+  {id:'dou', name:'赵小豆', emoji:'💡', role:'产品经理', bg:'#DDF7CE',
+   quote:'“我有个绝妙的想法！”（这是他本周第 17 个）',
+   tech:2, design:3, net:3, trait:'跳跃型',
+   traitDesc:'研发有概率爆发出灵感，也有概率把代码写崩。',
+   need:'产品经理头衔', needDesc:'他想自己决定下一个功能做什么。',
+   color:'#C6F73E',
+   opinion:{price:'B', cheat:'A', expo:'A'},
+   say:{price:'免费才有人玩啊，人多了以后再说钱的事。',
+        cheat:'从产品角度……（他眼睛亮了）这个真的会爆。',
+        expo:'去！我要给全校演示我的第 18 个想法。'}}
+];
+
+const ORIGINS = [
+  {id:'help', emoji:'🧩', name:'想帮同学解决错题', 
+   desc:'你自己也总在同一个地方错。你觉得这件事应该有更好的办法。',
+   bonus:'产品力 +8 · 口碑 +6', apply(){ S.productBonus=8; S.rep+=6; S.flags.origin='help'; }},
+  {id:'money', emoji:'💰', name:'想赚点零花钱', 
+   desc:'球鞋 399，压岁钱 120。你算过，还差很多。',
+   bonus:'起始现金 +40 · 收入 +10%', apply(){ S.cash+=40; S.flags.revBonus=0.1; S.flags.origin='money'; }},
+  {id:'cool', emoji:'🚀', name:'想做出全校最酷的东西', 
+   desc:'你不在乎赚不赚钱。你只想让别人看到的时候说一句：这也太酷了。',
+   bonus:'研发效率 +20% · 团队士气 +10', apply(){ S.flags.devBonus=0.2; S.morale+=10; S.flags.origin='cool'; }}
+];
+
+const TOPICS = {
+  price: {
+    id:'price', kicker:'第 2 周 · 第一次董事会',
+    title:'要不要开始收费？',
+    sub:'公司账上还剩一点钱，但下个月要交服务器电费了。三个创始人意见不一致。',
+    a:{label:'开始收 1 元', detail:'立刻有现金流，但会有同学说你变了。'},
+    b:{label:'继续免费', detail:'保住口碑和用户，但钱只会越来越少。'},
+    effect(side){
+      if(side==='A'){
+        S.price='once';
+        S.rep-=4; S.parent-=3;
+        pushLog('董事会决定：开始收 1 元。走廊里有人小声说「他变了」。');
+        return '从明天起，下载要 1 块钱。有人付了，也有人在班级群里发了一个翻白眼的表情。';
+      } else {
+        S.rep+=5; S.morale+=2;
+        pushLog('董事会决定：继续免费。大家都很开心，除了账本。');
+        return '你决定再等等。班级群里一片欢呼，只有你知道电费单还压在书包底下。';
+      }
+    }
+  },
+  cheat: {
+    id:'cheat', kicker:'第 4 周 · 紧急董事会',
+    title:'隔壁班抄我们，要不要上「一键抄作业」？',
+    sub:'三班的「学霸帮」上线了一个抄作业功能，三天涨了 80 个用户。你的团队吵成一团。',
+    a:{label:'上，先赢再说', detail:'用户会暴涨。但老师、家长、还有你自己的良心都会有问题。'},
+    b:{label:'不上，走正路', detail:'慢一点，但睡得着觉。'},
+    effect(side){
+      if(side==='A'){
+        if(!S.unlocked.includes('cheat')) S.unlocked.push('cheat');
+        if(!S.modules.includes('cheat') && S.modules.length<5) installModule('cheat', true);
+        S.users=Math.round(S.users*1.25);
+        S.rep-=8; S.parent-=10;
+        pushLog('董事会投票通过了「一键抄作业」。用户涨了，李老师的眉头也皱了。');
+        return '功能上线当晚，用户涨了 25%。第二天早读，李老师站在门口看了你很久。';
+      } else {
+        S.rep+=6; S.morale-=3; S.research+=15;
+        pushLog('董事会否决了「一键抄作业」，大家憋着一口气去做正经功能。');
+        return '你们没做。隔壁班继续涨，但你们把时间花在了错题本上。有人不服气，但没人退群。';
+      }
+    }
+  },
+  expo: {
+    id:'expo', kicker:'第 6 周 · 校园科技节',
+    title:'花 ¥40 参加校园科技节？',
+    sub:'校长亲自发了邀请函。一个展台 40 块，还要占掉一整个周六。',
+    a:{label:'参加，赌一把', detail:'产品够好就一炮而红，产品拉胯就当场社死。'},
+    b:{label:'不参加，省下钱', detail:'省钱保平安，但会错过全校曝光。'},
+    effect(side){
+      if(side==='A'){
+        S.cash-=40;
+        const good = productPower()>=45;
+        if(good){ S.users=Math.round(S.users*1.3)+15; S.rep+=10; S.morale+=6;
+          pushLog('科技节展台爆了，排队的人绕了半个操场。');
+          return '周六，你们的展台前排了很长的队。校长在你的海报前站了两分钟，说了一句「有点意思」。';
+        } else {
+          S.rep-=7; S.morale-=8; S.users+=8;
+          pushLog('科技节展台冷冷清清，隔壁班那边排着队。');
+          return '你的展台前面很空。隔壁班在用大喇叭演示抄作业功能，围了三层人。张大壮提前走了。';
+        }
+      } else {
+        S.morale-=4; S.cash+=0;
+        pushLog('董事会放弃科技节。省了 40 块，也少了一次被看见的机会。');
+        return '你没去。周六在家写作业，班级群里全是科技节的照片。林小美发了一条朋友圈，又删了。';
+      }
+    }
+  }
+};
+
+const EVENTS = [
+  {id:'teacher', emoji:'🧑‍🏫', kicker:'突发事件 · 合规危机',
+   title:'李老师发现了你的收款码',
+   desc:'早读前，李老师把你叫到走廊。她手里拿着一张打印出来的收款二维码：「这是你的吧？有家长问我，孩子在给谁交钱。」',
+   cond:s=> s.price!=='free' || s.modules.includes('cheat') || s.flags.teacherHeat>=3,
+   weight:3,
+   choices:[
+    {label:'全部退款，当面道歉', hint:'损失现金，但李老师会成为你的保护伞', cls:'good',
+     run(){ const back=Math.min(S.cash, 25); S.cash-=back; S.rep+=8; S.parent+=8; S.flags.teacherHeat=0;
+       return '你退了 '+back+' 块，写了 300 字检讨。李老师叹了口气：「下次先来找我。」'; }},
+    {label:'解释这是「学习互助基金」', hint:'一半概率说服她，一半概率火上浇油', cls:'risk',
+     run(){ if(chance(.5)){ S.rep+=5; S.parent+=4; S.flags.teacherHeat=0;
+         return '你讲得头头是道，李老师居然笑了：「那你把账目给我看看。」你逃过一劫。'; }
+       S.rep-=12; S.parent-=10; S.morale-=5; S.flags.teacherHeat=0;
+       return '李老师打断你三次，最后说：「叫你家长明天来一趟。」'; }},
+    {label:'嘴上答应，背后接着干', hint:'保住了钱，但风险在累积', cls:'risk',
+     run(){ S.rep-=5; S.flags.teacherHeat=(S.flags.teacherHeat||0)+2; S.cash+=10;
+       return '你表面上删了收款码，晚上换了个新的。钱还在进账，但你知道这事没完。'; }}
+   ]},
+
+  {id:'copycat', emoji:'🕵️', kicker:'突发事件 · 竞争',
+   title:'隔壁班抄了你的产品',
+   desc:'三班「学霸帮」上线了一个几乎一模一样的功能，连按钮颜色都没改。他们在年级群里说：「原创是我们。」',
+   cond:s=> s.week>=3 && s.users>25, weight:3,
+   choices:[
+    {label:'熬夜加速迭代，甩开他们', hint:'研发 +20，但团队会累', cls:'',
+     run(){ S.research+=20; S.morale-=7; S.flags.teacherHeat=(S.flags.teacherHeat||0)+1;
+       return '你们连着熬了三个晚上。新版上线那天，三班的用户掉了一半。王小胖在机房睡着了。'; }},
+    {label:'在年级群公开对线', hint:'有热度，但会结仇', cls:'risk',
+     run(){ S.rep-=5; S.users+=Math.round(S.users*.12)+5; S.morale-=2;
+       return '你在群里甩出了最早的代码截图。围观的人很多，点赞的也很多，但你们从此成了死对头。'; }},
+    {label:'提议联合作战', hint:'化敌为友，但要分出去一块', cls:'good',
+     run(){ S.users+=Math.round(S.users*.2)+8; S.rep+=7; S.cash-=8; S.morale+=3;
+       return '你约三班班长在小卖部谈了一次。最后决定一起做一个「年级版」，用户涨了一大截。'; }}
+   ]},
+
+  {id:'parentcall', emoji:'📞', kicker:'突发事件 · 家长',
+   title:'有家长在群里@了所有人',
+   desc:'「请问这个 App 是谁做的？为什么要收我孩子的钱？学校知道吗？」群里已经有 7 个人回复了「同问」。',
+   cond:s=> s.price!=='free' && s.week>=2, weight:3,
+   choices:[
+    {label:'挨个私聊，全额退款', hint:'现金 -20，家长满意度大涨', cls:'good',
+     run(){ S.cash-=20; S.parent+=12; S.rep+=5;
+       return '你给 7 个家长挨个发了长消息，还附上了自己的手写说明。有 2 个人反过来加了你微信。'; }},
+    {label:'送一个月家长日报免费版', hint:'用小功能换取理解', cls:'',
+     run(){ S.parent+=8; S.rep+=2; S.cash-=3;
+       return '家长日报确实有用。有家长说：「这个每天发一条，我还挺想看的。」投诉慢慢沉下去了。'; }},
+    {label:'让爸妈出面解释', hint:'危机转移给了家长', cls:'risk',
+     run(){ S.parent-=4; S.morale-=4; S.rep-=3;
+       return '你妈妈在群里说了一句话，群里安静了。但你总觉得，这件事变成了她的负担。'; }}
+   ]},
+
+  {id:'exam', emoji:'📝', kicker:'固定事件 · 期中考试',
+   title:'期中考试就在下周一',
+   desc:'班主任在黑板右上角写了倒计时：还有 5 天。你的团队里，有 3 个人的名字在「需重点关注」名单上。',
+   cond:()=>false, weight:99,
+   choices:[
+    {label:'停业一周，全员复习', hint:'成绩大涨，用户会流失', cls:'good',
+     run(){ const lost=Math.round(S.users*.12); S.users-=lost; S.grade+=14; S.parent+=8; S.morale+=4;
+       return '产品停更一周，掉了 '+lost+' 个用户。但考试成绩出来，团队里没有一个人掉队。'; }},
+    {label:'边学边干，晚上加班', hint:'两边都想要，两边都会差一点', cls:'',
+     run(){ S.grade+=3; S.morale-=6; S.research+=8;
+       return '你们白天上课，晚上改代码。成绩没崩，但王小胖在数学课上睡着了。'; }},
+    {label:'让团队顶着，我复习', hint:'你保住成绩，团队会记仇', cls:'risk',
+     run(){ S.grade+=10; S.morale-=12; S.rep-=4;
+       return '你考得不错。但团队群里有人说：「董事长这次没怎么出现。」'; }}
+   ]},
+
+  {id:'raise', emoji:'💸', kicker:'突发事件 · 团队',
+   title:'他们想要涨工资',
+   desc:'王小胖在群里发了一张奶茶价目表，配文：「每周 4 块，我连一杯都买不起。」下面跟着两个「+1」。',
+   cond:s=> s.cash>=80 && s.week>=2, weight:3,
+   choices:[
+    {label:'每人涨到 8 块', hint:'士气大涨，但成本翻倍', cls:'good',
+     run(){ S.cash-=20; S.team.forEach(m=>{m.loyalty+=15;}); S.morale+=8;
+       return '你当场宣布涨薪。王小胖说：「董事长，以后服务器崩了我第一个冲。」'; }},
+    {label:'画个饼：等赚钱了翻倍', hint:'省钱，但他们不傻', cls:'risk',
+     run(){ if(chance(.45)){ S.morale+=2; return '你还真讲出了个规划。他们半信半疑，但至少没闹。'; }
+       S.team.forEach(m=>{m.loyalty-=12;}); S.morale-=10;
+       return '王小胖回了一个「哦」。那天下午，他请了假。'; }},
+    {label:'不发钱，但每周请喝奶茶', hint:'花小钱，办大事', cls:'',
+     run(){ S.cash-=10; S.team.forEach(m=>{m.loyalty+=8;}); S.morale+=5;
+       return '你买了两排 AD 钙奶。团队在教室里碰了个杯，气氛比涨薪还好。'; }}
+   ]},
+
+  {id:'crash', emoji:'💻', kicker:'突发事件 · 技术',
+   title:'服务器崩了',
+   desc:'晚上 9 点，班级群炸了：「打不开了！」你跑去看，爸爸那台旧笔记本的风扇响得像拖拉机。',
+   cond:s=> s.users>40, weight:3,
+   choices:[
+    {label:'花 ¥15 让爸爸买新风扇', hint:'花钱，彻底解决', cls:'good',
+     run(){ S.cash-=15; S.rep+=4; return '风扇换好了，世界安静了。爸爸说：「这算公司固定资产。」'; }},
+    {label:'自己拆开吹一吹灰', hint:'免费，但会消耗研发时间', cls:'',
+     run(){ S.research=Math.max(0,S.research-10); S.morale-=3; S.rep+=2;
+       return '你拆开了笔记本，用吹风机吹了半小时。它活了，你也学会了一件事：便宜的东西总有代价。'; }},
+    {label:'先不管，明天再说', hint:'用户会流失', cls:'risk',
+     run(){ const lost=Math.round(S.users*.15); S.users-=lost; S.rep-=8;
+       return '第二天早上，'+lost+' 个用户再也没打开过。'; }}
+   ]},
+
+  {id:'badreview', emoji:'👎', kicker:'突发事件 · 口碑',
+   title:'有人做了「避雷帖」',
+   desc:'年级群里流传着一张截图，配文：「别用，卡得要死，还老是闪退。」转发已经 20 多次了。',
+   cond:s=> s.rep<58, weight:3,
+   choices:[
+    {label:'公开道歉 + 连夜修 bug', hint:'掉血但回血', cls:'good',
+     run(){ S.cash-=8; S.rep+=11; S.research+=6; S.morale-=3;
+       return '你发了一封很诚恳的说明，还附上了更新日志。有人说：「至少态度还行。」'; }},
+    {label:'找朋友去评论区洗白', hint:'可能翻车', cls:'risk',
+     run(){ if(chance(.4)){ S.rep+=3; return '评论区暂时好看了。但你总觉得这不叫解决问题。'; }
+       S.rep-=10; S.morale-=5; return '有人扒出来那几个账号是同班同学。避雷帖变成了「避雷避雷帖」。'; }},
+    {label:'不回应，用新功能说话', hint:'慢，但体面', cls:'',
+     run(){ S.research+=12; S.rep-=2; return '你什么都没说，只是把下个版本提前了两天。'; }}
+   ]},
+
+  {id:'influencer', emoji:'🌟', kicker:'突发事件 · 机会',
+   title:'六年级的网红学姐想合作',
+   desc:'学姐在短视频平台有 3000 个粉丝，都是同校的。她说可以拍一条视频，但要抽走你 30% 的收入。',
+   cond:s=> s.users>=70 && s.week>=3, weight:2,
+   choices:[
+    {label:'答应她，分成 30%', hint:'用户暴涨，但要分钱', cls:'',
+     run(){ S.users=Math.round(S.users*1.4)+12; S.flags.shareCut=0.3; S.rep+=3;
+       return '视频发出去当晚，用户翻了一截。评论区第一条是：「学姐推荐的，确实好用。」'; }},
+    {label:'拒绝，我们自己拍', hint:'省下分成，但要自己折腾', cls:'',
+     run(){ S.morale-=3; S.research-=5; S.users+=Math.round(S.users*.15);
+       return '你们自己拍了一条，画面有点抖，但很真实。播放量不如学姐，涨的人却都是真爱。'; }},
+    {label:'请她当「首席体验官」', hint:'花钱买背书', cls:'good',
+     run(){ S.cash-=20; S.users+=Math.round(S.users*.25)+10; S.rep+=5;
+       return '学姐成了「首席体验官」，海报上她的照片比你的公司名还大。但确实有用。'; }}
+   ]},
+
+  {id:'dadbill', emoji:'🧾', kicker:'突发事件 · 家庭',
+   title:'爸爸把电费单放在了你桌上',
+   desc:'单子上用红笔圈了一行：本月电费比上月多了 38 块。旁边压着一张便签：「公司的事，我们聊聊。」',
+   cond:s=> s.week>=2, weight:3,
+   choices:[
+    {label:'老老实实交 ¥20', hint:'花钱买安宁', cls:'good',
+     run(){ S.cash-=20; S.parent+=8; return '你把 20 块放在桌上。爸爸没说话，第二天给你换了个静音风扇。'; }},
+    {label:'跟他谈：这是投资', hint:'一半概率被认可', cls:'risk',
+     run(){ if(chance(.55)){ S.parent+=10; S.cash+=10; return '你讲了一个小时的商业计划。爸爸听完，掏出 10 块：「算我天使投资。」'; }
+       S.parent-=6; S.cash-=20; return '爸爸说：「投资可以，先把你数学考到 90。」你还是交了 20 块。'; }},
+    {label:'偷偷用学校机房', hint:'省钱，但有风险', cls:'risk',
+     run(){ S.cash+=0; S.flags.teacherHeat=(S.flags.teacherHeat||0)+2; S.morale-=2;
+       return '机房老师快下班的时候，你抱着 U 盘溜了进去。省了钱，但心跳了一晚上。'; }}
+   ]},
+
+  {id:'dividend', emoji:'🍬', kicker:'突发事件 · 团队',
+   title:'他们问：赚的钱，有没有我们的份？',
+   desc:'账上第一次有了三位数。王小胖在课间问了一句：「所以……我们是不是也该分一点？」',
+   cond:s=> s.cash>=120, weight:3,
+   choices:[
+    {label:'拿出 ¥30 当奖金', hint:'士气与忠诚大涨', cls:'good',
+     run(){ S.cash-=30; S.team.forEach(m=>{m.loyalty+=14;}); S.morale+=10;
+       return '你给每人发了 10 块。他们把钞票举起来拍了张照，配文：「人生第一笔分红。」'; }},
+    {label:'不分，全部投入研发', hint:'省钱，但人心会凉', cls:'risk',
+     run(){ S.team.forEach(m=>{m.loyalty-=10;}); S.morale-=9; S.research+=15;
+       return '你把钱全投进了新功能。团队没说什么，但那天没人主动加班。'; }},
+    {label:'不发钱，发零食大礼包', hint:'花小钱，热闹一场', cls:'',
+     run(){ S.cash-=12; S.team.forEach(m=>{m.loyalty+=7;}); S.morale+=6;
+       return '一箱零食放在讲台上，5 分钟就没了。赵小豆说：「这比钱香。」'; }}
+   ]},
+
+  {id:'inspire', emoji:'💡', kicker:'突发事件 · 灵感',
+   title:'凌晨 11 点，赵小豆发来 17 条语音',
+   desc:'他兴奋地说想到了一个绝妙的功能，能一下子解决所有人的痛点。语音条一条比一条长。',
+   cond:s=> s.team.some(m=>m.id==='dou'), weight:2,
+   choices:[
+    {label:'陪他通宵做出来', hint:'研发大涨，但大家会累', cls:'',
+     run(){ S.research+=26; S.morale-=6; S.team.forEach(m=>{m.loyalty+=4;});
+       return '你们做到了凌晨两点。功能第二天上线，反响意外地好。赵小豆在群里发了一个「我早就说过」。'; }},
+    {label:'记下来，下周再说', hint:'稳妥，但会错过', cls:'',
+     run(){ S.research+=8; S.morale+=2;
+       return '你把它写进了「想法池」。赵小豆有点失落，但第二天又提了 5 个新想法。'; }},
+    {label:'让他先写个方案', hint:'培养他，也拖慢进度', cls:'good',
+     run(){ S.morale+=4; S.team.forEach(m=>{ if(m.id==='dou'){ m.loyalty+=10; m.design+=1; } });
+       return '赵小豆真的写了三页方案，第一次没有跑题。你发现他其实很认真。'; }}
+   ]},
+
+  {id:'principal', emoji:'🏫', kicker:'突发事件 · 转折',
+   title:'校长想「收编」你的公司',
+   desc:'校长在办公室泡了茶：「你们做得不错。学校可以给你一间活动室、一台电脑，还有 50 块启动资金。但以后，这算学校的项目。」',
+   cond:s=> s.rep>=70 && s.week>=5, weight:3,
+   choices:[
+    {label:'接受，成为官方项目', hint:'稳，但不再是你的公司', cls:'good',
+     run(){ S.cash+=50; S.rep+=10; S.parent+=10; S.flags.annexed=true;
+       return '你签了字。活动室的钥匙沉甸甸的。门口的牌子写着「校园创新实践基地」，下面一行小字才是你的公司名。'; }},
+    {label:'婉拒，我们要自己干', hint:'自由，但少了靠山', cls:'risk',
+     run(){ S.rep+=4; S.morale+=6; S.flags.independent=true;
+       return '你说：「谢谢校长，但我们想自己试试。」校长愣了一下，然后笑了：「行，摔了别哭。」'; }},
+    {label:'谈条件：合作但不收编', hint:'很难，但最好', cls:'risk',
+     run(){ if(chance(.5)){ S.cash+=30; S.rep+=8; S.parent+=6; S.flags.partnered=true;
+         return '你和校长谈了 40 分钟，最后定成了「校企合作」。你保住了名字，也拿到了资源。'; }
+       S.rep-=2; S.morale-=3;
+       return '校长摇了摇头：「小朋友，有些东西不是谈出来的。」活动室的钥匙被收了回去。'; }}
+   ]}
+];
+
+const BADGES = [
+  {id:'first',  emoji:'🌱', name:'第一位用户', cond:s=>s.users>=1},
+  {id:'hundred',emoji:'💯', name:'百人社群',   cond:s=>s.users>=100},
+  {id:'money',  emoji:'🤑', name:'第一桶金',   cond:s=>s.cash>=200},
+  {id:'perfect',emoji:'🧠', name:'产品力 80+', cond:s=>productPower()>=80},
+  {id:'clean',  emoji:'✨', name:'零差评',     cond:s=>s.rep>=85},
+  {id:'loyal',  emoji:'🫶', name:'全员死忠',   cond:s=>s.team.length>0 && s.team.every(m=>m.loyalty>=80)},
+  {id:'grade',  emoji:'🎓', name:'学霸董事长', cond:s=>s.grade>=95},
+  {id:'risk',   emoji:'😈', name:'刀尖起舞',   cond:s=>s.modules.includes('cheat')}
+];
+
+let S = null;
+let UI = { tab:'product', pendingEvent:null, pendingBoard:null, reportAfter:null };
+
+/* ---------------- 基础工具 ---------------- */
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const rand = (a,b) => a + Math.random()*(b-a);
+const chance = p => Math.random() < p;
+const esc = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sum = arr => arr.reduce((a,b)=>a+b,0);
+
+let audioCtx = null, soundOn = true;
+function beep(freq=520, dur=.07, type='square', vol=.035){
+  if(!soundOn) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.value = vol;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(.0001, audioCtx.currentTime + dur);
+    o.stop(audioCtx.currentTime + dur + .01);
+  }catch(e){}
+}
+function sfxClick(){ beep(430,.04,'square',.025); }
+function sfxGood(){ beep(660,.06,'triangle',.04); setTimeout(()=>beep(880,.09,'triangle',.04),60); }
+function sfxBad(){ beep(180,.14,'sawtooth',.03); }
+function sfxCash(){ beep(880,.05,'sine',.045); setTimeout(()=>beep(1180,.07,'sine',.035),55); }
+
+function toggleSound(){
+  soundOn = !soundOn;
+  $('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  if(soundOn) sfxClick();
+  save();
+}
+
+function toast(msg, type=''){
+  const root = $('toastRoot');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  root.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .3s, transform .3s'; el.style.opacity='0'; el.style.transform='translateY(6px)'; }, 2100);
+  setTimeout(()=>el.remove(), 2500);
+}
+
+function confetti(n=46){
+  const box = document.createElement('div');
+  box.className = 'confetti';
+  const colors = ['#C6F73E','#7CD4FF','#FFA6C9','#FFB443','#C4A9FF','#15171C'];
+  for(let i=0;i<n;i++){
+    const p = document.createElement('i');
+    p.style.left = rand(0,100)+'vw';
+    p.style.top = (-rand(0,20))+'vh';
+    p.style.background = colors[Math.floor(rand(0,colors.length))];
+    p.style.animationDuration = rand(1.6,3.2)+'s';
+    p.style.animationDelay = rand(0,.5)+'s';
+    p.style.transform = 'rotate('+rand(0,360)+'deg)';
+    if(chance(.4)) p.style.borderRadius = '50%';
+    box.appendChild(p);
+  }
+  document.body.appendChild(box);
+  setTimeout(()=>box.remove(), 3600);
+}
+
+/* ---------------- 状态 ---------------- */
+function newState(){
+  return {
+    ceo:'', company:'', week:1, maxWeek:8,
+    cash:120, users:0, rep:50, morale:62, grade:82, parent:72,
+    research:0,
+    team:[], modules:[], unlocked:[], price:'free', channel:'class',
+    unlockedChannels:['class'],
+    blocks:{dev:1, mkt:1, team:1, study:1},
+    talked:false, log:[], seenEvents:[], flags:{}, sound:soundOn
+  };
+}
+
+const SAVE_KEY = 'dongshizhang_v1';
+
+function save(){
+  if(!S) return;
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){}
+}
+function hasSave(){
+  try{ return !!localStorage.getItem(SAVE_KEY); }catch(e){ return false; }
+}
+function loadSave(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    if(!d || !d.company) return null;
+    return d;
+  }catch(e){ return null; }
+}
+
+/* ---------------- 计算 ---------------- */
+function teamSkill(k){
+  return S.team.reduce((a,m)=> a + (m[k]||0), 0);
+}
+function hasMember(id){ return S.team.some(m=>m.id===id); }
+function productPower(){
+  let p = S.modules.reduce((a,id)=>{
+    const m = MODULES.find(x=>x.id===id);
+    return a + (m ? m.power : 0);
+  }, 0);
+  p += Math.round(teamSkill('design') * 1.2);
+  SYNERGIES.forEach(sy=>{
+    if(sy.has.every(id=>S.modules.includes(id))) p += sy.bonus;
+  });
+  p += (S.flags.productBonus || 0);
+  return Math.max(0, p);
+}
+function activeSynergies(){
+  return SYNERGIES.filter(sy=> sy.has.every(id=>S.modules.includes(id)));
+}
+function upkeep(){
+  return S.modules.reduce((a,id)=>{
+    const m = MODULES.find(x=>x.id===id);
+    return a + (m ? m.upkeep : 0);
+  }, 0);
+}
+function salary(){
+  const per = 4 + (S.week >= 5 ? 1 : 0);
+  return S.team.length * per;
+}
+function currentChannel(){
+  return CHANNELS.find(c=>c.id===S.channel) || CHANNELS[0];
+}
+function forecastNewUsers(){
+  const ch = currentChannel();
+  if(!S.blocks.mkt) return 0;
+  const base = ch.reach * 0.15 * S.blocks.mkt;
+  const f = (0.35 + productPower()/70) * (0.70 + S.rep/160) * (1 + teamSkill('net')*0.025);
+  return Math.round(base * f);
+}
+function forecastRevenue(){
+  const u = S.users;
+  const price = PRICES[S.price];
+  let rev = 0;
+  if(S.price==='once') rev = Math.round(forecastNewUsers()*price.rate*price.amount);
+  if(S.price==='member') rev = Math.round(u*price.rate*price.amount);
+  if(S.price==='parent') rev = Math.round(u*price.rate*price.amount);
+  rev = Math.round(rev * (1 + (S.flags.revBonus||0)) * (1 - (S.flags.shareCut||0)));
+  return rev;
+}
+function needMet(m){
+  switch(m.id){
+    case 'wang': return S.cash >= 40;
+    case 'mei': return !!m.needDone;
+    case 'zhuang': return !!m.needDone;
+    case 'xing': return S.grade >= 75;
+    case 'dou': return !!m.needDone;
+  }
+  return true;
+}
+function blockSum(){ return S.blocks.dev + S.blocks.mkt + S.blocks.team + S.blocks.study; }
+function pushLog(t){
+  S.log.unshift({w:S.week, t});
+  if(S.log.length > 40) S.log.pop();
+}
+
+/* ---------------- 屏幕切换 ---------------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = $(id);
+  if(el) el.classList.add('active');
+  window.scrollTo(0,0);
+  $('bottombar').style.display = (id==='s-game') ? 'block' : 'none';
+  document.body.style.paddingBottom = (id==='s-game') ? '0' : '0';
+}
+
+function startNew(){
+  S = newState();
+  renderOrigins();
+  showScreen('s-setup');
+  setTimeout(()=>{ const i=$('inpCeo'); if(i && window.innerWidth>700) i.focus(); }, 240);
+  sfxClick();
+}
+
+function continueGame(){
+  const d = loadSave();
+  if(!d){ toast('没有找到存档'); return; }
+  S = d;
+  soundOn = S.sound !== false;
+  $('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  showScreen('s-game');
+  renderAll();
+  toast('欢迎回来，董事长', 'good');
+}
+
+function renderOrigins(){
+  $('originGrid').innerHTML = ORIGINS.map(o=>`
+    <button class="origin-card" id="ori-${o.id}" onclick="pickOrigin('${o.id}')">
+      <span class="oi">${o.emoji}</span>
+      <div>
+        <h4>${o.name}</h4>
+        <p>${o.desc}</p>
+        <span class="origin-bonus">${o.bonus}</span>
+      </div>
+    </button>`).join('');
+}
+function pickOrigin(id){
+  sfxClick();
+  if(!S) S = newState();
+  S.origin = id;
+  document.querySelectorAll('.origin-card').forEach(c=>c.classList.remove('sel'));
+  const el = $('ori-'+id);
+  if(el) el.classList.add('sel');
+}
+
+function gotoHire(){
+  const ceo = ($('inpCeo').value || '').trim();
+  const comp = ($('inpCompany').value || '').trim();
+  if(!ceo){ toast('先给自己起个名字吧'); $('inpCeo').focus(); return; }
+  if(!comp){ toast('公司还没名字呢'); $('inpCompany').focus(); return; }
+  if(!S.origin){ toast('选一个创业初心'); return; }
+  S.ceo = ceo; S.company = comp;
+  if(!S.team.length) S.flags.hired = [];
+  UI.hire = [];
+  renderHire();
+  showScreen('s-hire');
+  sfxClick();
+}
+
+/* ---------------- 招聘 ---------------- */
+function renderHire(){
+  $('hireGrid').innerHTML = CANDIDATES.map(c=>{
+    const sel = UI.hire.includes(c.id);
+    return `
+    <button class="mate-card ${sel?'sel':''}" onclick="toggleHire('${c.id}')">
+      <div class="mate-top">
+        <div class="avatar" style="background:${c.bg}">${c.emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div class="mate-name">${c.name} <span class="tag" style="font-size:9px;padding:2px 6px">${c.trait}</span></div>
+          <div class="mate-role">${c.role} · 想加入你的公司</div>
+        </div>
+      </div>
+      <p class="mate-quote">${c.quote}</p>
+      <div class="skill-row">
+        <span class="skill-pill">技术 <b>${c.tech}</b></span>
+        <span class="skill-pill">设计 <b>${c.design}</b></span>
+        <span class="skill-pill">人脉 <b>${c.net}</b></span>
+      </div>
+      <div class="need-line">他的诉求：<b>${c.need}</b> — ${c.needDesc}</div>
+      <div class="need-line" style="opacity:.7">${c.traitDesc}</div>
+    </button>`;
+  }).join('');
+  $('hireCount').textContent = UI.hire.length;
+  $('hireBtn').disabled = UI.hire.length !== 3;
+}
+
+function toggleHire(id){
+  sfxClick();
+  const i = UI.hire.indexOf(id);
+  if(i >= 0) UI.hire.splice(i,1);
+  else{
+    if(UI.hire.length >= 3){ toast('最多只能签 3 个人，公司养不起更多'); return; }
+    UI.hire.push(id);
+  }
+  renderHire();
+}
+
+function finishHire(){
+  if(UI.hire.length !== 3) return;
+  S.team = UI.hire.map(id=>{
+    const c = CANDIDATES.find(x=>x.id===id);
+    return Object.assign({}, c, {loyalty: 56 + Math.round(rand(0,12)), needDone:false});
+  });
+  S.modules = ['wrongbook'];
+  S.unlocked = ['wrongbook'];
+  ORIGINS.find(o=>o.id===S.origin).apply();
+  S.flags.hired = UI.hire.slice();
+  showScreen('s-game');
+  UI.tab = 'product';
+  renderAll();
+  save();
+  setTimeout(()=>showIntro(), 420);
+  sfxGood();
+  confetti(36);
+}
+
+function showIntro(){
+  openModal(`
+    <div class="modal-stripe"></div>
+    <div class="modal-body">
+      <div class="event-emoji">🎉</div>
+      <div class="event-kicker">第 1 周 · 开张</div>
+      <h2 class="event-title">「${esc(S.company)}」正式营业</h2>
+      <p class="event-desc">
+        你的启动资金是 <b>¥${S.cash}</b>，团队 3 个人，产品里只有一个还没做完的「错题本 2.0」。<br><br>
+        接下来 8 个星期，每个星期你只有 <b>4 个时间块</b>。投进研发，产品会变强；投进推广，用户会变多；投进团队，大家会开心；投进学习，成绩才不会崩。<br><br>
+        <b>但你只有 4 块。</b>这就是当董事长最难的地方。
+      </p>
+      <button class="btn lime wide" onclick="closeModal();goTab('plan')">去安排第一周 →</button>
+    </div>`);
+}
+
+/* ---------------- Tab / 渲染 ---------------- */
+function goTab(tab){
+  sfxClick();
+  UI.tab = tab;
+  document.querySelectorAll('.tab-item').forEach(b=>{
+    b.classList.toggle('on', b.dataset.tab === tab);
+  });
+  renderTab();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function renderAll(){
+  if(!S) return;
+  $('hudWeek').textContent = String(S.week).padStart(2,'0');
+  $('hudCompany').textContent = S.company;
+  renderHUD();
+  renderTab();
+  renderFooter();
+  $('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+}
+
+const HUD_LAST = {};
+function renderHUD(){
+  const items = [
+    {k:'cash',  icon:'💰', label:'现金',  v:S.cash,  bar: clamp(S.cash/3,0,100)},
+    {k:'users', icon:'👥', label:'用户',  v:S.users, bar: clamp(S.users/5,0,100)},
+    {k:'rep',   icon:'⭐', label:'口碑',  v:S.rep,   bar:S.rep},
+    {k:'morale',icon:'🔥', label:'士气',  v:S.morale,bar:S.morale},
+    {k:'grade', icon:'📚', label:'成绩',  v:S.grade, bar:S.grade},
+    {k:'parent',icon:'👪', label:'家长', v:S.parent,bar:S.parent}
+  ];
+  $('statGrid').innerHTML = items.map(it=>`
+    <div class="stat ${it.k}" id="stat-${it.k}">
+      <span class="sl">${it.icon} ${it.label}</span>
+      <span class="sv">${it.k==='cash' ? '¥'+Math.round(it.v) : Math.round(it.v)}</span>
+      <i class="sbar" style="width:${clamp(it.bar,0,100)}%"></i>
+    </div>`).join('');
+  items.forEach(it=>{
+    if(HUD_LAST[it.k] !== undefined && HUD_LAST[it.k] !== Math.round(it.v)){
+      const el = $('stat-'+it.k);
+      if(el){ el.classList.add('pop'); setTimeout(()=>el.classList.remove('pop'), 360); }
+    }
+    HUD_LAST[it.k] = Math.round(it.v);
+  });
+}
+
+function renderFooter(){
+  const b = S.blocks;
+  $('endWeekHint').textContent = `研发 ${b.dev} · 推广 ${b.mkt} · 团队 ${b.team} · 学习 ${b.study}`;
+  const left = 4 - blockSum();
+  $('endWeekBtn').classList.toggle('ready', left === 0);
+  document.querySelectorAll('.tab-item').forEach(x=>x.classList.toggle('on', x.dataset.tab === UI.tab));
+}
+
+function renderTab(){
+  const body = $('tabBody');
+  if(!body) return;
+  if(UI.tab === 'product') body.innerHTML = renderProduct();
+  if(UI.tab === 'market') body.innerHTML = renderMarket();
+  if(UI.tab === 'team') body.innerHTML = renderTeam();
+  if(UI.tab === 'plan') body.innerHTML = renderPlan();
+}
+
+/* ---------------- 产品页 ---------------- */
+function renderProduct(){
+  const power = productPower();
+  const installed = S.modules.map(id=>MODULES.find(m=>m.id===id)).filter(Boolean);
+  const price = PRICES[S.price];
+
+  const phoneMods = installed.length
+    ? installed.map(m=>`<div class="app-mod"><span class="am-i">${m.emoji}</span><span class="am-t">${m.name}</span></div>`).join('')
+    : `<div class="app-empty">还没有功能<br>去右边研发一个吧</div>`;
+
+  const installedRows = installed.length
+    ? installed.map(m=>`
+      <div class="installed-row">
+        <span style="font-size:16px">${m.emoji}</span>
+        <span>${m.name}</span>
+        <span class="tag" style="font-size:9px;padding:1px 6px">维护 ¥${m.upkeep}</span>
+        <button class="ir-x" onclick="uninstallModule('${m.id}')" title="卸载">×</button>
+      </div>`).join('')
+    : `<div class="empty-note">产品还是空的。<br>研发并装上一个功能，同学才有理由打开它。</div>`;
+
+  const syns = activeSynergies();
+  const synHtml = syns.length
+    ? `<div class="syn-list">${syns.map(sy=>`
+        <div class="syn ${sy.bonus<0?'neg':''}">
+          <span>${sy.bonus>0?'🔗':'⚠️'}</span>
+          <span>${sy.text}</span>
+          <span style="margin-left:auto" class="mono">${sy.bonus>0?'+':''}${sy.bonus}</span>
+        </div>`).join('')}</div>`
+    : '';
+
+  const cards = MODULES.map(m=>{
+    const unlocked = S.unlocked.includes(m.id);
+    const on = S.modules.includes(m.id);
+    if(on) return '';
+    const canR = !unlocked && S.research >= m.cost && S.cash >= m.cash;
+    const canI = unlocked && S.modules.length < 5;
+    return `
+    <div class="mod-card ${unlocked?'on':''} ${m.danger?'danger':''}">
+      <div class="mod-head">
+        <span class="mod-emoji">${m.emoji}</span>
+        <div>
+          <div class="mod-title">${m.name}</div>
+          <div class="mod-cat">${m.cat}${m.danger?' · 高风险':''}</div>
+        </div>
+        <span class="mod-power">+${m.power}</span>
+      </div>
+      <p class="mod-desc">${m.desc}</p>
+      <div class="mod-cost">
+        ${unlocked
+          ? `<span class="cost-pill">已研发 ✓</span>`
+          : `<span class="cost-pill">研发 ${m.cost} 点</span><span class="cost-pill">现金 ¥${m.cash}</span>`}
+        <span class="cost-pill">维护 ¥${m.upkeep}/周</span>
+      </div>
+      <div class="mod-actions">
+        ${!unlocked
+          ? `<button class="btn sm ${canR?'lime':''}" ${canR?'':'disabled'} onclick="researchModule('${m.id}')">研发</button>
+             <span style="font-size:10px;color:#777;font-weight:700">${canR?'':'研发点或现金不够'}</span>`
+          : `<button class="btn sm blue" ${canI?'':'disabled'} onclick="installModule('${m.id}')">装到产品上</button>
+             <span style="font-size:10px;color:#777;font-weight:700">${canI?'':'产品最多 5 个功能'}</span>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="tab-pane">
+    <div class="product-layout">
+      <div>
+        <div class="phone">
+          <div class="phone-notch"></div>
+          ${S.price!=='free' ? `<div class="price-badge">${price.icon} ${price.name}</div>` : ''}
+          <div class="phone-screen">
+            <div class="app-top">
+              <div class="app-logo">${esc(S.company)}</div>
+              <div class="app-sub">让学习，变得好玩一点</div>
+            </div>
+            <div class="app-mods">${phoneMods}</div>
+            <div class="app-tabbar"><div class="on">首页</div><div>排行</div><div>我的</div></div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:10px;color:#888;font-weight:700;margin-top:9px">同学手机里看到的样子</p>
+      </div>
+
+      <div>
+        <div class="panel">
+          <div class="power-box">
+            <div class="power-num">${power}</div>
+            <div class="power-meta">
+              <div class="power-label">产品力 · 决定用户愿不愿意留下来</div>
+              <div class="power-track"><i class="power-fill" style="width:${clamp(power,0,100)}%"></i></div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-bottom:4px">
+            <span>研发点 <b class="mono">${S.research}</b></span>
+            <span>已装 <b class="mono">${S.modules.length}/5</b></span>
+          </div>
+          <div style="font-size:10.5px;color:#777;font-weight:700;line-height:1.6">
+            研发点靠每周投入「产品研发」获得。设计能力也会让产品更好看、更好用。
+          </div>
+          ${synHtml}
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title"><span class="pi">📦</span>已装功能</div>
+            <div class="panel-sub">每周维护 ¥${upkeep()}</div>
+          </div>
+          ${installedRows}
+        </div>
+
+        <div class="panel-head" style="margin:18px 0 10px">
+          <div class="panel-title"><span class="pi">🧪</span>功能实验室</div>
+          <div class="panel-sub">研发 → 装到产品</div>
+        </div>
+        <div class="mod-grid">${cards || '<div class="empty-note">所有功能都装上了，去市场看看怎么卖吧。</div>'}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function researchModule(id){
+  const m = MODULES.find(x=>x.id===id);
+  if(!m || S.unlocked.includes(id)) return;
+  if(S.research < m.cost){ toast('研发点不够，还差 '+(m.cost-S.research)); sfxBad(); return; }
+  if(S.cash < m.cash){ toast('现金不够，研发要花 ¥'+m.cash); sfxBad(); return; }
+  S.research -= m.cost;
+  S.cash -= m.cash;
+  S.unlocked.push(id);
+  pushLog('研发完成：'+m.name+'。');
+  toast('研发成功：'+m.name, 'good');
+  sfxGood();
+  save(); renderAll();
+}
+
+function installModule(id, silent){
+  const m = MODULES.find(x=>x.id===id);
+  if(!m) return;
+  if(S.modules.includes(id)){ toast('已经装上了'); return; }
+  if(S.modules.length >= 5){ toast('产品最多 5 个功能，先卸一个'); sfxBad(); return; }
+  S.modules.push(id);
+  if(!silent){
+    pushLog('把「'+m.name+'」装进了产品。');
+    toast('已装上：'+m.name, 'good');
+    sfxClick();
+  }
+  save(); renderAll();
+}
+
+function uninstallModule(id){
+  const m = MODULES.find(x=>x.id===id);
+  S.modules = S.modules.filter(x=>x!==id);
+  if(m) pushLog('卸载了「'+m.name+'」，腾出一个位置。');
+  toast('已卸载，位置空出来了');
+  sfxClick();
+  save(); renderAll();
+}
+
+/* ---------------- 市场页 ---------------- */
+function renderMarket(){
+  const ch = currentChannel();
+  const expUsers = forecastNewUsers();
+  const expRev = forecastRevenue();
+
+  const priceCards = Object.values(PRICES).map(p=>{
+    const sel = S.price === p.id;
+    let revTxt = '预计收入 ¥0';
+    if(p.id==='once') revTxt = '预计收入 ¥' + Math.round(expUsers*p.rate*p.amount);
+    if(p.id==='member') revTxt = '预计收入 ¥' + Math.round(S.users*p.rate*p.amount);
+    if(p.id==='parent') revTxt = '预计收入 ¥' + Math.round(S.users*p.rate*p.amount);
+    return `
+    <button class="price-card ${sel?'sel':''}" onclick="setPrice('${p.id}')">
+      <div class="pc-top"><span>${p.icon}</span>${p.name}</div>
+      <div class="pc-amt">${p.amount? '¥'+p.amount : '免费'}</div>
+      <div class="pc-desc">${p.desc}</div>
+      <div class="pc-rev">${revTxt}</div>
+    </button>`;
+  }).join('');
+
+  const chanRows = CHANNELS.map(c=>{
+    const unlocked = S.unlockedChannels.includes(c.id);
+    const sel = S.channel === c.id;
+    const dots = [0,1,2,3].map(i=>`<i class="${i< c.risk?'on':''}"></i>`).join('');
+    return `
+    <div class="chan-row ${sel?'sel':''} ${unlocked?'':'locked'}">
+      <div class="chan-emoji">${c.emoji}</div>
+      <div class="chan-main">
+        <div class="chan-name">${c.name}
+          ${sel?'<span class="tag" style="font-size:9px;padding:1px 5px;background:#7CD4FF">正在用</span>':''}
+        </div>
+        <div class="chan-meta">触达上限 ${c.reach} 人 · 被老师发现 ${dots}</div>
+      </div>
+      ${unlocked
+        ? (sel ? `<span class="tag" style="font-size:10px">使用中</span>`
+               : `<button class="btn xs" onclick="setChannel('${c.id}')">切换</button>`)
+        : `<button class="btn xs orange" onclick="unlockChannel('${c.id}')">开通 ¥${c.cost}</button>`}
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="pi">💳</span>定价</div>
+        <div class="panel-sub">改价格会影响口碑</div>
+      </div>
+      <div class="price-grid">${priceCards}</div>
+      <p style="font-size:10.5px;color:#777;font-weight:700;line-height:1.7;margin-top:10px">
+        ${S.price==='free' ? '现在完全免费。免费能换来用户和口碑，但账上不会多一分钱。' : '收费会带来现金流，但每收一次钱，口碑都会掉一点。'}
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="pi">📡</span>推广渠道</div>
+        <div class="panel-sub">触达上限决定用户天花板</div>
+      </div>
+      ${chanRows}
+      <p style="font-size:10.5px;color:#777;font-weight:700;line-height:1.7;margin-top:4px">
+        用户超过渠道上限后会开始流失。想做大，就得去更显眼的地方——也更容易被老师看见。
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="pi">🔮</span>本周预估</div>
+        <div class="panel-sub">按当前安排</div>
+      </div>
+      <div class="forecast-box">
+        推广时间块：<b>${S.blocks.mkt}</b> 块 · 渠道：<b>${ch.name}</b><br>
+        预计新增用户：<b>+${expUsers}</b> 人<br>
+        产品力：<b>${productPower()}</b> · 口碑：<b>${Math.round(S.rep)}</b><br>
+        预计收入：<b>¥${expRev}</b> · 固定支出：<b>¥${salary()+upkeep()}</b>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setPrice(id){
+  if(S.price === id) return;
+  S.price = id;
+  sfxClick();
+  const p = PRICES[id];
+  pushLog('把定价改成了「'+p.name+'」。');
+  toast(id==='free' ? '改成免费了，口碑会好看一些' : '定价：'+p.name);
+  save(); renderAll();
+}
+
+function setChannel(id){
+  if(S.channel === id) return;
+  S.channel = id;
+  sfxClick();
+  toast('推广渠道切换到「'+CHANNELS.find(c=>c.id===id).name+'」');
+  save(); renderAll();
+}
+
+function unlockChannel(id){
+  const c = CHANNELS.find(x=>x.id===id);
+  if(S.unlockedChannels.includes(id)){ setChannel(id); return; }
+  if(S.cash < c.cost){ toast('现金不够，开通要 ¥'+c.cost); sfxBad(); return; }
+  S.cash -= c.cost;
+  S.unlockedChannels.push(id);
+  S.channel = id;
+  pushLog('花 ¥'+c.cost+' 开通了「'+c.name+'」。');
+  toast('已开通「'+c.name+'」','good');
+  sfxCash();
+  save(); renderAll();
+}
+
+/* ---------------- 团队页 ---------------- */
+function renderTeam(){
+  const cards = S.team.map(m=>{
+    const met = needMet(m);
+    const satCost = {wang:8, mei:0, zhuang:12, dou:6, xing:0}[m.id] ?? 0;
+    return `
+    <div class="member-card">
+      <div class="member-top">
+        <div class="avatar" style="background:${m.bg}">${m.emoji}</div>
+        <div class="member-info">
+          <div class="mate-name" style="font-size:14px">${m.name}
+            <span class="tag" style="font-size:9px;padding:1px 6px">${m.trait}</span>
+          </div>
+          <div class="mate-role">${m.role}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-size:17px;font-weight:900">${Math.round(m.loyalty)}</div>
+          <div style="font-size:9px;font-weight:800;color:#888">忠诚度</div>
+        </div>
+      </div>
+      <div class="loyalty-wrap">
+        <div class="loyalty-track"><i class="loyalty-fill" style="width:${clamp(m.loyalty,0,100)}%;background:${m.loyalty<35?'#FF6B5A':m.color}"></i></div>
+      </div>
+      <div class="member-say">「${m.say[['price','cheat','expo'][S.week<=2?0:S.week<=4?1:2]]}」</div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <span class="need-chip ${met?'ok':'no'}">${met?'✓':'✕'} 诉求：${m.need}</span>
+        <span style="font-size:10px;color:#888;font-weight:700">${met?'TA 最近挺满意':'还没被满足，忠诚度每周下降'}</span>
+      </div>
+      <div class="member-actions">
+        <button class="btn xs ${S.talked?'':'blue'}" ${S.talked?'disabled':''} onclick="talkTo('${m.id}')">
+          ${S.talked?'本周已聊过':'单独聊聊 ¥5'}
+        </button>
+        ${!met ? `<button class="btn xs lime" onclick="satisfy('${m.id}')">满足他的心愿 ${satCost?'¥'+satCost:''}</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="pi">🧑‍🤝‍🧑</span>创始团队</div>
+        <div class="panel-sub">每人每周工资 ¥${4+(S.week>=5?1:0)}</div>
+      </div>
+      ${cards}
+      <p class="team-note">忠诚度低于 30，有人会提离职。<br>每周投入「团队时间」能让所有人开心一点。</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="pi">📋</span>团队周报</div>
+        <div class="panel-sub">第 ${S.week} 周</div>
+      </div>
+      <div class="forecast-box">
+        研发效率加成：<b>+${Math.round(teamSkill('tech')*4)}%</b><br>
+        推广效率加成：<b>+${Math.round(teamSkill('net')*2.5)}%</b><br>
+        设计加成（直接算进产品力）：<b>+${Math.round(teamSkill('design')*1.2)}</b>
+      </div>
+    </div>
+  </div>`;
+}
+
+function talkTo(id){
+  if(S.talked){ toast('这周已经聊过了，留点时间给自己'); return; }
+  const m = S.team.find(x=>x.id===id);
+  if(!m) return;
+  if(S.cash < 5){ toast('连买两瓶水的钱都没有了'); sfxBad(); return; }
+  S.cash -= 5;
+  S.talked = true;
+  m.loyalty = clamp(m.loyalty + 12, 0, 100);
+  const lines = {
+    wang:'你们蹲在操场边聊了 20 分钟。他说其实不怕累，就怕做的东西没人用。',
+    mei:'她给你看了她画的产品草图，比你想象中认真得多。你说了一句「很好看」，她耳朵红了。',
+    zhuang:'他承认自己有时候太冲，但他说：「我就是不想输给三班。」',
+    xing:'他把这周的作业清单摊开给你看，说：「我不是反对你，我是怕你摔。」',
+    dou:'他讲了 6 个想法，你打断了 5 个。剩下那个，你们都觉得不错。'
+  };
+  toast(m.name+' 的忠诚度 +12','good');
+  sfxGood();
+  pushLog('找 '+m.name+' 单独聊了聊。');
+  save(); renderAll();
+  setTimeout(()=>toast(lines[id]||'你们聊得不错'), 400);
+}
+
+function satisfy(id){
+  const m = S.team.find(x=>x.id===id);
+  if(!m) return;
+  const costs = {wang:8, mei:0, zhuang:12, dou:6, xing:0};
+  const cost = costs[id] ?? 0;
+  if(S.cash < cost){ toast('现金不够'); sfxBad(); return; }
+  S.cash -= cost;
+  m.needDone = true;
+  m.loyalty = clamp(m.loyalty + 18, 0, 100);
+  const txt = {
+    wang:'你设立了「零食基金」。王小胖当场宣布：以后服务器归他管。',
+    mei:'关于页面加了一行小字：设计 · 林小美。她盯着那行字看了很久。',
+    zhuang:'你封他当副董事长。他第二天就在校门口用上了这个头衔。',
+    dou:'他成了产品经理，第一件事是给自己负责的功能加了个彩蛋。',
+    xing:'你陪他把这周的作业过了一遍。他说：「行，那我再信你一次。」'
+  };
+  if(id==='xing') S.grade = clamp(S.grade + 3, 0, 100);
+  toast(txt[id], 'good');
+  sfxGood();
+  pushLog('满足了 '+m.name+' 的心愿：'+m.need+'。');
+  save(); renderAll();
+}
+
+/* ---------------- 计划页 ---------------- */
+function renderPlan(){
+  const rows = [
+    {k:'dev', ico:'🔧', bg:'#DDF7CE', name:'产品研发', desc:'研发点、解锁新功能'},
+    {k:'mkt', ico:'📣', bg:'#D9F3FF', name:'市场推广', desc:'拉新用户'},
+    {k:'team', ico:'🤝', bg:'#FFE3EF', name:'团队沟通', desc:'提升士气与忠诚'},
+    {k:'study',ico:'📖', bg:'#E5DCFF', name:'自己学习', desc:'保住成绩，稳住家长'}
+  ];
+  const left = 4 - blockSum();
+
+  const rowsHtml = rows.map(r=>{
+    const n = S.blocks[r.k];
+    let cast = '';
+    if(r.k==='dev'){
+      const pts = Math.round(n * 8 * (1 + teamSkill('tech')*0.04 + (S.flags.devBonus||0)));
+      cast = n ? '+'+pts+' 研发点' : '—';
+    }
+    if(r.k==='mkt') cast = n ? '预计 +'+forecastNewUsers()+' 人' : '—';
+    if(r.k==='team') cast = n ? '士气 +'+Math.round(n*11-4) : '士气 -4';
+    if(r.k==='study') cast = n ? '成绩 +'+Math.round(n*8-5) : '成绩 -5';
+    return `
+    <div class="block-row">
+      <div class="block-ico" style="background:${r.bg}">${r.ico}</div>
+      <div class="block-main">
+        <div class="block-name">${r.name}</div>
+        <div class="block-desc">${r.desc}</div>
+      </div>
+      <div class="block-cast">${cast}</div>
+      <div class="stepper">
+        <button ${n<=0?'disabled':''} onclick="setBlock('${r.k}',-1)">−</button>
+        <span class="cnt">${n}</span>
+        <button ${left<=0?'disabled':''} onclick="setBlock('${r.k}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  const dots = [0,1,2,3].map(i=>`<i class="${i<blockSum()?'on':''}"></i>`).join('');
+  const logs = S.log.slice(0,7).map(l=>`<div class="log-item"><span class="lw">W${l.w}</span><span>${l.t}</span></div>`).join('')
+    || '<div class="empty-note">还没有记录。第一周，从做决定开始。</div>';
+
+  return `
+  <div class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="pi">🗓️</span>本周的 4 个时间块</div>
+        <div class="panel-sub">第 ${S.week} / 8 周</div>
+      </div>
+      ${rowsHtml}
+      <div class="blocks-left">
+        <span>还剩 <b class="mono" style="font-size:16px">${left}</b> 块</span>
+        <div class="blocks-dots">${dots}</div>
+      </div>
+      <p style="font-size:10.5px;color:#777;font-weight:700;line-height:1.7;margin-top:8px">
+        ${left>0 ? '还有时间没安排。点「结束本周」会自动把剩下的时间拿去学习。' : '4 块都用完了。想清楚了吗？'}
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="pi">🧮</span>本周结算预览</div>
+        <div class="panel-sub">粗略估算</div>
+      </div>
+      <div class="forecast-box">
+        收入：<b>¥${forecastRevenue()}</b> · 工资：<b>¥${salary()}</b> · 维护：<b>¥${upkeep()}</b><br>
+        预计净现金：<b style="color:${forecastRevenue()-salary()-upkeep()>=0?'#2E8B2E':'#FF6B5A'}">${forecastRevenue()-salary()-upkeep()>=0?'+':''}¥${forecastRevenue()-salary()-upkeep()}</b><br>
+        渠道：<b>${currentChannel().name}</b> · 定价：<b>${PRICES[S.price].name}</b>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title"><span class="pi">📔</span>董事长日志</div>
+        <div class="panel-sub">最近的记录</div>
+      </div>
+      ${logs}
+    </div>
+  </div>`;
+}
+
+function setBlock(k, d){
+  const cur = S.blocks[k];
+  const left = 4 - blockSum();
+  if(d > 0 && left <= 0){ toast('只有 4 个时间块，得从别的地方挪'); return; }
+  if(d < 0 && cur <= 0) return;
+  S.blocks[k] = clamp(cur + d, 0, 4);
+  sfxClick();
+  renderTab(); renderFooter(); save();
+}
+
+/* ---------------- 弹窗 ---------------- */
+function openModal(html, opts){
+  opts = opts || {};
+  $('modalRoot').innerHTML = '<div class="modal-mask" onclick="maskClick(event)"><div class="modal">'+html+'</div></div>';
+  document.body.style.overflow = 'hidden';
+  UI.modalClosable = opts.closable !== false;
+}
+function updateModal(html){
+  const m = document.querySelector('#modalRoot .modal');
+  if(m) m.innerHTML = html;
+}
+function closeModal(){
+  $('modalRoot').innerHTML = '';
+  document.body.style.overflow = '';
+}
+function maskClick(e){
+  if(e.target.classList && e.target.classList.contains('modal-mask') && UI.modalClosable !== false){
+    closeModal();
+  }
+}
+
+/* ---------------- 周结算 ---------------- */
+function snapshot(){
+  return {cash:S.cash, users:S.users, rep:S.rep, morale:S.morale, grade:S.grade, parent:S.parent, research:S.research};
+}
+
+function endWeek(){
+  if(UI.busy) return;
+  const rest = 4 - blockSum();
+  if(rest > 0){
+    S.blocks.study += rest;
+    toast('剩下 ' + rest + ' 块时间，拿去写作业了');
+  }
+  UI.busy = true;
+  UI.snap = snapshot();
+  resolveWeek();
+}
+
+function resolveWeek(){
+  sfxClick();
+  // ---- 1. 研发 ----
+  let devPts = Math.round(S.blocks.dev * 8 * (1 + teamSkill('tech')*0.04 + (S.flags.devBonus||0)));
+  if(devPts > 0 && hasMember('wang') && S.blocks.dev >= 2 && chance(.25)){
+    devPts = Math.round(devPts * 0.7);
+    pushLog('王小胖花了一个时间块看漫画，研发慢了一点。');
+  }
+  if(devPts > 0 && hasMember('dou') && chance(.15)){
+    devPts = Math.round(devPts * 1.5);
+    pushLog('赵小豆突然来了灵感，研发快了一大截。');
+  }
+  S.research += devPts;
+
+  // ---- 2. 用户 ----
+  const ch = currentChannel();
+  let gain = 0;
+  if(S.blocks.mkt > 0){
+    const base = ch.reach * 0.15 * S.blocks.mkt;
+    const f = (0.35 + productPower()/70) * (0.70 + S.rep/160) * (1 + teamSkill('net')*0.025);
+    gain = Math.round(base * f);
+  }
+  const natural = Math.round(S.users * 0.05 * (S.rep/100) * (productPower()/50));
+  let gross = gain + natural;
+  if(S.users >= ch.reach) gross = Math.round(gross * 0.15);
+  const churnRate = 0.05 + Math.max(0,(55-S.rep))/300 + (S.users >= ch.reach ? 0.09 : 0);
+  const churned = Math.round(S.users * churnRate);
+  S.users = Math.max(0, S.users + gross - churned);
+
+  // ---- 3. 收入与支出 ----
+  const p = PRICES[S.price];
+  let rev = 0;
+  if(S.price === 'once') rev = Math.round(gross * p.rate * p.amount);
+  if(S.price === 'member') rev = Math.round(S.users * p.rate * p.amount);
+  if(S.price === 'parent') rev = Math.round(S.users * p.rate * p.amount);
+  rev = Math.round(rev * (1 + (S.flags.revBonus||0)) * (1 - (S.flags.shareCut||0)));
+  const cost = salary() + upkeep();
+  S.cash += rev - cost;
+
+  // ---- 4. 成绩 ----
+  let gd = S.blocks.study*8 - 5;
+  if(hasMember('xing')) gd += 4;
+  S.grade = clamp(S.grade + gd, 0, 100);
+
+  // ---- 5. 士气与忠诚 ----
+  let md = -4 + S.blocks.team*11;
+  if(S.blocks.dev >= 3) md -= 7;
+  S.team.forEach(m=>{
+    if(needMet(m)) m.loyalty = clamp(m.loyalty + 1, 0, 100);
+    else { m.loyalty = clamp(m.loyalty - 2, 0, 100); md -= 2; }
+  });
+  S.morale = clamp(S.morale + md, 0, 100);
+
+  // ---- 6. 口碑 ----
+  let rd = (productPower() - 30)/15;
+  rd += ({free:0, once:-1, member:-2, parent:-2.5})[S.price] || 0;
+  if(S.modules.includes('cheat')) rd -= 3;
+  if(S.modules.includes('report')) rd += 2;
+  if(S.flags.annexed) rd += 1;
+  S.rep = clamp(S.rep + rd, 0, 100);
+
+  // ---- 7. 家长 ----
+  let pd = 0;
+  if(S.price !== 'free') pd -= 3;
+  if(S.modules.includes('report')) pd += 5;
+  if(S.blocks.study > 0) pd += 2; else pd -= 4;
+  if(S.grade < 60) pd -= 6;
+  if(S.channel === 'parents') pd += 2;
+  if(S.modules.includes('cheat')) pd -= 4;
+  S.parent = clamp(S.parent + pd, 0, 100);
+
+  // ---- 8. 记录 ----
+  pushLog('本周研发 +'+devPts+'，新增 '+gross+' 人，流失 '+churned+' 人，净收入 ¥'+(rev-cost)+'。');
+  if(S.cash < 0) pushLog('现金变成负数了。爸爸问我要不要先把公司关了。');
+
+  // ---- 9. 离职预警 ----
+  S.team.forEach(m=>{
+    if(m.loyalty < 30 && !m.warned){
+      m.warned = true;
+      toast(m.name+' 最近不太高兴，找你聊了聊离职的事','bad');
+      pushLog(m.name+' 提了离职。你暂时把他留下了，但他的心不在这儿。');
+    }
+  });
+
+  save();
+  renderHUD(); renderTab(); renderFooter();
+  sfxCash();
+
+  UI.maybeResult = {gross, churned, rev, cost, devPts};
+  setTimeout(()=> maybeEvent(()=>showReport()), 420);
+}
+
+function maybeEvent(cb){
+  let ev = null;
+  if(S.week === 5){
+    ev = EVENTS.find(e=>e.id === 'exam');
+  } else if(chance(0.7)){
+    const pool = EVENTS.filter(e=> e.id !== 'exam' && !S.seenEvents.includes(e.id) && (!e.cond || e.cond(S)));
+    if(pool.length){
+      let total = sum(pool.map(e=>e.weight));
+      let r = Math.random()*total;
+      for(const e of pool){ r -= e.weight; if(r <= 0){ ev = e; break; } }
+    }
+  }
+  if(ev){
+    S.seenEvents.push(ev.id);
+    showEvent(ev, cb);
+  } else cb();
+}
+
+/* ---------------- 事件 ---------------- */
+function showEvent(ev, cb){
+  UI.pendingEvent = {ev, cb};
+  const choices = ev.choices.map((c,i)=>`
+    <button class="choice ${c.cls||''}" onclick="pickChoice(${i})">
+      <div class="ch-label">${c.label}</div>
+      <div class="ch-hint">${c.hint}</div>
+    </button>`).join('');
+  openModal(`
+    <div class="modal-stripe"></div>
+    <div class="modal-body">
+      <div class="event-emoji">${ev.emoji}</div>
+      <div class="event-kicker">${ev.kicker}</div>
+      <h2 class="event-title">${ev.title}</h2>
+      <p class="event-desc">${ev.desc}</p>
+      <div style="font-size:10px;font-weight:900;letter-spacing:1px;color:#888;margin-bottom:8px">你会怎么做？</div>
+      ${choices}
+    </div>`, {closable:false});
+}
+
+function pickChoice(i){
+  const pe = UI.pendingEvent;
+  if(!pe) return;
+  const c = pe.ev.choices[i];
+  sfxClick();
+  let res = '事情就这么发生了。';
+  try{ res = c.run() || res; }catch(e){ console.warn(e); }
+  save();
+  renderHUD(); renderTab(); renderFooter();
+  updateModal(`
+    <div class="modal-stripe"></div>
+    <div class="modal-body">
+      <div class="event-emoji" style="font-size:38px">${c.cls==='risk' ? '😬' : '📌'}</div>
+      <div class="event-kicker">事件结果</div>
+      <p class="event-desc" style="font-size:13.5px;color:var(--ink)">${res}</p>
+      <div class="diary" style="border-left-color:var(--orange)">
+        <b>董事长笔记：</b>每个选择都有代价。真正的决策，是在两个都不太好的选项里挑一个。
+        <span class="sig">—— ${esc(S.ceo)}</span>
+      </div>
+      <button class="btn lime wide" onclick="afterEvent()">继续 →</button>
+    </div>`);
+  if(c.cls==='risk') sfxBad(); else sfxGood();
+}
+
+function afterEvent(){
+  const pe = UI.pendingEvent;
+  closeModal();
+  UI.pendingEvent = null;
+  const cb = pe ? pe.cb : null;
+  setTimeout(()=>{ if(cb) cb(); }, 140);
+}
+
+/* ---------------- 周报 ---------------- */
+function deltaRow(label, icon, before, after, suffix){
+  const d = Math.round(after - before);
+  const cls = d > 0 ? 'up' : (d < 0 ? 'down' : 'flat');
+  const sign = d > 0 ? '+' : '';
+  return `<div class="delta"><span>${icon} ${label}</span><span class="dv ${cls}">${sign}${d}${suffix||''}</span></div>`;
+}
+
+function diaryLines(){
+  const s = UI.snap, l = [];
+  const du = S.users - s.users;
+  if(du >= 20) l.push('今天在走廊上，一个低年级的小朋友认出了我，问我什么时候更新。我假装很淡定，其实走回教室的路上一直在笑。');
+  if(du > 0 && du < 20) l.push('用户又多了一点。不多，但每一个都是真的。');
+  if(du < 0) l.push('掉了几个用户。原因我大概知道，只是不太想承认。');
+  if(S.cash < 25) l.push('我把账本翻了三遍，数字还是那么小。'+(S.cash<0?'我开始想，要不要跟爸爸借钱。':''));
+  if(S.morale < 42) l.push('下午的会没人主动说话。这种安静，比吵架还让人难受。');
+  if(S.grade < 68) l.push('数学卷子发下来了。我把它塞进了书包最底下。');
+  if(S.grade >= 90) l.push('这周的成绩还不错。原来时间是真的能挤出来的，只是要少睡一点。');
+  if(S.rep >= 72) l.push('年级群里有人说「这个是真的好用」。我截图存下来了。');
+  if(S.parent < 45) l.push('妈妈又在饭桌上问：「你那个东西，到底什么时候结束？」');
+  if(S.blocks.dev >= 3) l.push('这周几乎全砸在产品上了。产品是变好了，人快没了。');
+  if(S.blocks.mkt >= 3) l.push('传单发出去两大摞，手都酸了。但用户是真的涨了。');
+  if(S.modules.includes('cheat')) l.push('抄作业功能上线后，用的人很多。我不敢在班群里说话。');
+  if(l.length < 2) l.push('普通的一周。改了几个 bug，回了几个消息，作业写完了。');
+  if(l.length < 2) l.push('学校的生活还在继续，公司也是。有时候我觉得自己像个真的董事长。');
+  return l.slice(0,2);
+}
+
+function showReport(){
+  const s = UI.snap;
+  const rows = [
+    deltaRow('用户','👥', s.users, S.users, ' 人'),
+    deltaRow('现金','💰', s.cash, S.cash, ' 元'),
+    deltaRow('口碑','⭐', s.rep, S.rep, ''),
+    deltaRow('士气','🔥', s.morale, S.morale, ''),
+    deltaRow('成绩','📚', s.grade, S.grade, ''),
+    deltaRow('家长','👪', s.parent, S.parent, '')
+  ].join('');
+  const diary = diaryLines().map(t=>'<p>'+t+'</p>').join('');
+  const mr = UI.maybeResult || {gross:0,churned:0,rev:0,cost:0,devPts:0};
+  openModal(`
+    <div class="modal-stripe"></div>
+    <div class="modal-body">
+      <div class="report-week">WEEK ${String(S.week).padStart(2,'0')} / 08</div>
+      <h2 class="report-title">第 ${S.week} 周 · 周报</h2>
+      <div class="delta-grid">${rows}</div>
+      <div style="font-size:11px;font-weight:700;color:#777;line-height:1.9;margin-bottom:12px">
+        本周研发 +${mr.devPts} 点 · 新增 ${mr.gross} 人 · 流失 ${mr.churned} 人<br>
+        收入 ¥${mr.rev} · 工资与维护 ¥${mr.cost}
+      </div>
+      <div class="diary">
+        <b>董事长日记</b>
+        ${diary}
+        <span class="sig">—— ${esc(S.ceo)}，第 ${S.week} 周</span>
+      </div>
+      <button class="btn lime wide" onclick="closeReport()">${S.week >= S.maxWeek ? '看看最后的结果 →' : '进入第 '+(S.week+1)+' 周 →'}</button>
+    </div>`, {closable:false});
+  sfxGood();
+}
+
+function closeReport(){
+  closeModal();
+  setTimeout(advance, 140);
+}
+
+function advance(){
+  if(S.week >= S.maxWeek){ showEnding(); return; }
+  const e = calcEnding();
+  if(e && e.fail){ showEnding(); return; }
+  S.week++;
+  S.talked = false;
+  S.blocks = {dev:1, mkt:1, team:1, study:1};
+  S.team.forEach(m=>{ m.warned = false; });
+  save();
+  renderAll();
+  UI.busy = false;
+  if([2,4,6].includes(S.week)){
+    setTimeout(showBoard, 380);
+  } else {
+    setTimeout(()=>toast('第 '+S.week+' 周开始了，重新安排时间块'), 300);
+  }
+}
+
+/* ---------------- 董事会投票 ---------------- */
+function showBoard(){
+  const topicId = S.week === 2 ? 'price' : (S.week === 4 ? 'cheat' : 'expo');
+  UI.board = {topic: TOPICS[topicId], stance:null, flipped:{}, persuaded:false};
+  renderBoard();
+}
+
+function boardInner(){
+  const b = UI.board, t = b.topic;
+  const rows = S.team.map(m=>{
+    let op = m.opinion[t.id];
+    if(b.flipped[m.id]) op = op === 'A' ? 'B' : 'A';
+    const flip = !!b.flipped[m.id];
+    return `
+    <div class="vote-row ${flip?'flipped':''}">
+      <div class="avatar" style="background:${m.bg};width:38px;height:38px;font-size:19px;border-radius:11px">${m.emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12.5px;font-weight:900">${m.name}
+          <span style="font-size:10px;color:#888;font-weight:700">· ${m.role}</span>
+        </div>
+        <div class="vquote">「${m.say[t.id]}」</div>
+        ${flip
+          ? `<div style="font-size:10px;font-weight:900;color:#2E8B2E;margin-top:5px">✓ 被你说服，改主意了</div>`
+          : (b.persuaded
+              ? `<div style="font-size:10px;font-weight:800;color:#aaa;margin-top:5px">说服机会已用完</div>`
+              : `<button class="flip-btn" onclick="persuade('${m.id}')">私下说服 TA</button>`)}
+      </div>
+      <span class="vote-badge ${op==='A'?'a':'b'}">${op==='A'?t.a.label:t.b.label}</span>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="modal-stripe"></div>
+    <div class="modal-body">
+      <div class="event-kicker">${t.kicker}</div>
+      <div class="board-head"><span style="font-size:24px">🗳️</span><h2 class="board-title">${t.title}</h2></div>
+      <p class="board-sub">${t.sub}</p>
+      <p style="font-size:10.5px;font-weight:800;color:#888;line-height:1.6;margin:-4px 0 10px">
+        整场会议只有 1 次私下说服的机会。用错人，就浪费了。
+      </p>
+      ${rows}
+      <div style="font-size:10px;font-weight:900;letter-spacing:1px;color:#888;margin:14px 0 6px">你的立场（董事长 1 票，平票时你拍板）</div>
+      <div class="stance-grid">
+        <button class="stance ${b.stance==='A'?'sel':''}" onclick="setStance('A')">${t.a.label}<br><span style="font-size:9.5px;font-weight:700;opacity:.65">${t.a.detail}</span></button>
+        <button class="stance ${b.stance==='B'?'sel':''}" onclick="setStance('B')">${t.b.label}<br><span style="font-size:9.5px;font-weight:700;opacity:.65">${t.b.detail}</span></button>
+      </div>
+      <button class="btn lime wide" onclick="castVote()">投票表决 →</button>
+      <p style="font-size:10px;color:#888;font-weight:700;text-align:center;margin-top:9px;line-height:1.6">
+        每个人都会按自己的想法投票。结果不一定听你的——这就是董事会。
+      </p>
+    </div>`;
+}
+
+function renderBoard(){
+  if(document.querySelector('#modalRoot .modal')) updateModal(boardInner());
+  else openModal(boardInner(), {closable:false});
+}
+
+function setStance(s){
+  sfxClick();
+  UI.board.stance = s;
+  renderBoard();
+}
+
+function persuade(id){
+  const b = UI.board;
+  if(!b || b.persuaded) return;
+  const m = S.team.find(x=>x.id === id);
+  if(!m) return;
+  b.persuaded = true;
+  const p = clamp(0.45 + m.loyalty/200, 0.3, 0.9);
+  if(chance(p)){
+    b.flipped[id] = true;
+    m.loyalty = clamp(m.loyalty + 4, 0, 100);
+    sfxGood();
+    toast('你说服了 '+m.name+'，他改主意了','good');
+  } else {
+    m.loyalty = clamp(m.loyalty - 8, 0, 100);
+    S.morale = clamp(S.morale - 3, 0, 100);
+    sfxBad();
+    toast(m.name+' 没被说服，还有点生气','bad');
+  }
+  save();
+  renderHUD();
+  renderBoard();
+}
+
+function castVote(){
+  const b = UI.board;
+  if(!b.stance){ toast('先选一个你的立场'); return; }
+  let a = 0, bb = 0;
+  const detail = S.team.map(m=>{
+    let op = m.opinion[b.topic.id];
+    if(b.flipped[m.id]) op = op === 'A' ? 'B' : 'A';
+    if(op === 'A') a++; else bb++;
+    return {m, op};
+  });
+  if(b.stance === 'A') a++; else bb++;
+  let side;
+  if(a > bb) side = 'A';
+  else if(bb > a) side = 'B';
+  else side = b.stance;
+  const tie = (a === bb);
+
+  const text = b.topic.effect(side);
+  detail.forEach(d=>{
+    if(d.op === side) d.m.loyalty = clamp(d.m.loyalty + 4, 0, 100);
+    else d.m.loyalty = clamp(d.m.loyalty - 4, 0, 100);
+  });
+  S.morale = clamp(S.morale + (side === b.stance ? 3 : -5), 0, 100);
+  save();
+  renderHUD();
+
+  const names = detail.filter(d=>d.op === side).map(d=>d.m.name).join('、') || '只有你自己';
+  updateModal(`
+    <div class="modal-stripe"></div>
+    <div class="modal-body">
+      <div class="event-kicker">表决结果</div>
+      <h2 class="board-title" style="margin-bottom:4px">${side === 'A' ? b.topic.a.label : b.topic.b.label}</h2>
+      <div class="tally">
+        <div>${a}<span>赞成 A</span></div>
+        <div style="opacity:.3">:</div>
+        <div>${bb}<span>赞成 B</span></div>
+      </div>
+      <p style="font-size:11px;font-weight:800;text-align:center;color:#777;margin-top:-4px">
+        ${tie ? '平票，由董事长拍板' : '多数通过'} · 支持你的是：${names}
+      </p>
+      <p class="event-desc" style="margin-top:14px">${text}</p>
+      <div class="diary" style="border-left-color:var(--purple)">
+        <b>董事长笔记：</b>开会不是为了证明我对，是为了让大家愿意一起往下走。
+        <span class="sig">—— ${esc(S.ceo)}</span>
+      </div>
+      <button class="btn lime wide" onclick="closeBoard()">散会，回办公室 →</button>
+    </div>`, {closable:false});
+  if(side === b.stance) sfxGood(); else sfxBad();
+}
+
+function closeBoard(){
+  closeModal();
+  UI.board = null;
+  renderAll();
+  save();
+  setTimeout(()=>toast('第 '+S.week+' 周，重新安排时间块'), 200);
+}
+
+/* ---------------- 结局 ---------------- */
+function calcEnding(){
+  if(S.cash < -20) return {id:'bankrupt', fail:true};
+  if(S.grade < 50) return {id:'grade', fail:true};
+  if(S.parent < 28) return {id:'mom', fail:true};
+  if(S.morale < 18) return {id:'quit', fail:true};
+  if(S.users >= 260 && S.cash >= 160 && S.rep >= 68) return {id:'unicorn'};
+  if(S.rep >= 78 && S.users >= 100) return {id:'official'};
+  if(S.flags.annexed && S.rep >= 60) return {id:'official'};
+  if(S.morale >= 68 && S.users >= 50) return {id:'happy'};
+  return {id:'normal'};
+}
+
+const ENDINGS = {
+  bankrupt:{emoji:'💸', kicker:'结局 · 清算', title:'公司还剩 3 块 5',
+    desc:'账上第一次出现负数的时候，你以为只是暂时的。后来你开始用午饭钱垫服务器电费，再后来，连打印海报的钱都没有了。<br><br>你把爸爸的笔记本还了回去，在班级群里发了一句「暂停更新」。有人回了个「啊」，然后就没人说话了。<br><br><b>你学会的第一课：梦想很贵，现金流才是氧气。</b>'},
+  grade:{emoji:'📉', kicker:'结局 · 学业告急', title:'被收进柜子里的路由器',
+    desc:'成绩单发下来那天，妈妈没有骂你。她只是把路由器拔了，收进了客厅的柜子，说：「先把这个学期过完。」<br><br>公司没有倒闭，只是停在了第 6 周。用户还在问什么时候更新，你回了一句「等我考完」。<br><br><b>你学会的第二课：你可以同时想要很多东西，但时间只有一份。</b>'},
+  mom:{emoji:'🔌', kicker:'结局 · 家长会之后', title:'家长会上的三分钟',
+    desc:'家长会上，有三位家长提到了你的名字。不是表扬。妈妈回来以后，把你的收款码、海报和那台旧电脑一起收进了纸箱。<br><br>她说：「我知道你不是坏孩子。但你现在最重要的是读书。」你没有反驳，因为你也不知道该怎么反驳。<br><br><b>你学会的第三课：产品再好，也要先搞定最关心你的人。</b>'},
+  quit:{emoji:'🚪', kicker:'结局 · 团队散伙', title:'最后一次群聊',
+    desc:'群里最后一条消息是王小胖发的：「那我先退了，有事叫我。」然后是一个退出群聊的系统提示。<br><br>你一个人坐在教室里，第一次发现，做一个人的公司其实很容易——只是没什么意思。<br><br><b>你学会的第四课：公司不是代码，是人。人走了，就真的走了。</b>'},
+  unicorn:{emoji:'🦄', kicker:'结局 · 校园独角兽', title:'全校都在用你做的东西',
+    desc:'期末那天，校长在升旗仪式上念了你的公司名字。走廊上有人举着手机喊：「哎，这个是你做的吧？」<br><br>账上有钱，团队还在，成绩也没崩。你站在队伍里，努力让自己看起来没那么激动。<br><br>妈妈在家长群里转发了一条链接，配文是：「我儿子做的。」<br><br><b>你成了这所学校里的一个传说。而这一切，是从 4 个时间块开始的。</b>'},
+  official:{emoji:'🏫', kicker:'结局 · 被学校收编', title:'校门口那块新牌子',
+    desc:'学期末，学校在活动室门口钉了一块牌子：「校园创新实践基地」。下面一行小字，才是你的公司名。<br><br>你拿到了钥匙、一台新电脑，还有一间不用抢的教室。代价是，每次更新都要先给老师看一遍。<br><br>有人说你被「招安」了。你想了想，觉得也没什么不好——至少，它活下来了。<br><br><b>你学会的第五课：有些坚持，是靠妥协换来的。</b>'},
+  happy:{emoji:'🍭', kicker:'结局 · 快乐小作坊', title:'一个不大的公司',
+    desc:'8 周结束，你的用户不算多，账上的钱也不多。但团队还在，每周五下午大家会一起在小卖部买点东西。<br><br>林小美在关于页面留了名字。张大壮还在跟三班较劲。王小胖说下学期想做个新功能。<br><br>这不是一个了不起的商业故事。但它是一个你愿意继续做下去的故事。<br><br><b>你学会的第六课：不是每家公司都要改变世界，有些公司只是让人开心。</b>'},
+  normal:{emoji:'🎒', kicker:'结局 · 平稳结业', title:'一个普通的学期',
+    desc:'8 周过去了。你做成了一些事，也搞砸了一些事。用户不算多，钱基本没赚到，成绩勉强保住。<br><br>老师在评语里写：「该生思维活跃，但需要更专注。」你把这句话读了两遍，觉得她说得挺对。<br><br>公司还在，虽然小。下个学期要不要继续，你还没想好。<br><br><b>但你确定一件事：下次再开公司，你会更早开始想「钱从哪来」。</b>'}
+};
+
+function showEnding(){
+  UI.busy = true;
+  const e = calcEnding();
+  const ed = ENDINGS[e.id] || ENDINGS.normal;
+  const got = BADGES.filter(b=>{ try{ return b.cond(S); }catch(err){ return false; } });
+  const badgeHtml = BADGES.map(b=>{
+    const on = got.includes(b);
+    return `<span class="badge ${on?'':'off'}">${b.emoji} ${b.name}</span>`;
+  }).join('');
+  const wasFail = !!e.fail;
+  openModal(`
+    <div class="modal-stripe"></div>
+    <div class="modal-body">
+      <div class="end-hero">
+        <div class="end-emoji">${ed.emoji}</div>
+        <div class="end-kicker">${ed.kicker}</div>
+        <h2 class="end-title">${ed.title}</h2>
+        <div style="font-size:11px;font-weight:800;color:#888">${esc(S.company)} · 董事长 ${esc(S.ceo)}</div>
+      </div>
+      <div class="end-desc">${ed.desc}</div>
+      <div class="end-stats">
+        <div class="end-stat"><span class="es-v">${Math.round(S.users)}</span><span class="es-l">用户</span></div>
+        <div class="end-stat"><span class="es-v">¥${Math.round(S.cash)}</span><span class="es-l">现金</span></div>
+        <div class="end-stat"><span class="es-v">${Math.round(S.rep)}</span><span class="es-l">口碑</span></div>
+        <div class="end-stat"><span class="es-v">${Math.round(S.morale)}</span><span class="es-l">士气</span></div>
+        <div class="end-stat"><span class="es-v">${Math.round(S.grade)}</span><span class="es-l">成绩</span></div>
+        <div class="end-stat"><span class="es-v">${Math.round(S.parent)}</span><span class="es-l">家长</span></div>
+      </div>
+      <div style="font-size:10px;font-weight:900;letter-spacing:1px;color:#888;margin-bottom:4px">
+        获得的徽章 ${got.length} / ${BADGES.length}
+      </div>
+      <div class="badge-grid">${badgeHtml}</div>
+      ${wasFail ? '<p style="font-size:11px;color:#888;font-weight:700;text-align:center;margin-bottom:10px">提前结束也是一种结果。下一局，你会更早看到问题。</p>' : ''}
+      <button class="btn lime wide" style="margin-bottom:9px" onclick="restart()">再开一家公司 →</button>
+      <button class="btn wide" onclick="copyResult()">复制这张成绩单</button>
+    </div>`, {closable:false});
+  if(!wasFail){ confetti(80); sfxGood(); }
+  else sfxBad();
+  try{ localStorage.removeItem(SAVE_KEY); }catch(err){}
+}
+
+function copyResult(){
+  const e = calcEnding();
+  const ed = ENDINGS[e.id] || ENDINGS.normal;
+  const txt = '【董事长一年级】\n' + ed.title + '\n用户 ' + Math.round(S.users) + ' · 现金 ¥' + Math.round(S.cash) +
+    ' · 口碑 ' + Math.round(S.rep) + ' · 士气 ' + Math.round(S.morale) +
+    ' · 成绩 ' + Math.round(S.grade) + '\n公司：' + S.company + '（董事长 ' + S.ceo + '）';
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>toast('成绩单已复制，去炫耀吧','good'), ()=>toast('复制失败，截个图吧'));
+  } else {
+    toast('长按截图保存吧');
+  }
+}
+
+function restart(){
+  closeModal();
+  S = null;
+  UI = {tab:'product', pendingEvent:null, pendingBoard:null, reportAfter:null};
+  Object.keys(HUD_LAST).forEach(k=>delete HUD_LAST[k]);
+  $('continueBtn').style.display = hasSave() ? 'block' : 'none';
+  showScreen('s-title');
+  window.scrollTo(0,0);
+}
+
+/* ---------------- 帮助 ---------------- */
+function openHelp(){
+  openModal(`
+    <div class="modal-stripe"></div>
+    <div class="modal-body">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="event-kicker">游戏说明</div>
+      <h2 class="event-title" style="margin-bottom:10px">怎么当好这个董事长</h2>
+
+      <div class="help-h">🎯 目标</div>
+      <p class="help-p">用 8 个星期，把一家只有 3 个人的小学生公司做起来。你可以做大、做稳、做赚钱，也可以做得让大家开心——但很难全都要。</p>
+
+      <div class="help-h">🗓️ 每周只有 4 个时间块</div>
+      <ul class="help-list">
+        <li><b>研发</b>：攒研发点，解锁新功能</li>
+        <li><b>推广</b>：拉新用户，受渠道和口碑影响</li>
+        <li><b>团队</b>：提升士气和忠诚度</li>
+        <li><b>学习</b>：保住成绩，否则家长会出手</li>
+      </ul>
+
+      <div class="help-h">🧠 四个关键数值</div>
+      <ul class="help-list">
+        <li><b>口碑</b>：决定自然增长和流失，收费、抄作业都会掉口碑</li>
+        <li><b>士气</b>：太低会有人离职，团队直接散伙</li>
+        <li><b>成绩</b>：低于 50 会被强制关停</li>
+        <li><b>家长</b>：低于 28，路由器就没了</li>
+      </ul>
+
+      <div class="help-h">🗳️ 董事会</div>
+      <p class="help-p">第 2、4、6 周会开董事会。三个创始人各有立场，你只有 1 票，但每场会有 1 次「私下说服」的机会。投票结果可能违背你的意愿——这就是真实的组织。</p>
+
+      <div class="help-h">⚡ 突发事件</div>
+      <p class="help-p">每周都可能出事：老师检查、隔壁班抄袭、家长投诉、服务器崩溃……每个选择都有代价，没有完美答案。</p>
+
+      <div class="help-h">🛠️ 产品</div>
+      <p class="help-p">研发功能后装进产品，最多 5 个。某些功能组合会有<b>协同加成</b>，也有一些组合会互相打架。产品力决定用户愿不愿意留下。</p>
+
+      <div class="help-h">✍️ 设计说明</div>
+      <p class="help-p">这不是一个「点点点就赢」的模拟经营。我们希望孩子体验三件事：<b>资源的稀缺</b>（只有 4 个时间块）、<b>决策的代价</b>（每个选择都有人不满意）、<b>团队的复杂</b>（说服、妥协、投票）。<br><br>每一次「结束本周」，都会得到一份真实的反馈：数字、日记，和一句不那么好听的话。</p>
+      <p style="font-size:10px;color:#aaa;font-weight:700;margin-top:12px;text-align:center">用 TRAE 制作 · 单文件运行，无需联网</p>
+      ${(S && S.company) ? '<button class="btn wide" style="margin-top:16px" onclick="quitGame()">放弃这一局，重新开始</button>' : ''}
+    </div>`);
+}
+
+function quitGame(){
+  if(!window.confirm('确定要放弃这一局吗？当前进度会被清除。')) return;
+  try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+  closeModal();
+  S = null;
+  UI = {tab:'product'};
+  Object.keys(HUD_LAST).forEach(k=>delete HUD_LAST[k]);
+  $('continueBtn').style.display = 'none';
+  showScreen('s-title');
+}
+
+/* ---------------- 初始化 ---------------- */
+(function init(){
+  $('continueBtn').style.display = hasSave() ? 'block' : 'none';
+  document.querySelectorAll('.tab-item').forEach(b=>{
+    b.addEventListener('click', ()=>goTab(b.dataset.tab));
+  });
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && UI.modalClosable !== false) closeModal();
+  });
+  // 防止移动端双击缩放
+  let lastTouch = 0;
+  document.addEventListener('touchend', e=>{
+    const now = Date.now();
+    if(now - lastTouch < 300) e.preventDefault();
+    lastTouch = now;
+  }, {passive:false});
+})();
+
+</script>
+</body>
+</html>
