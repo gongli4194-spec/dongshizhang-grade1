@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#F6F2E7">
-<title>董事长一年级 · 小学生创业模拟器</title>
+<title>小学生玩耍公司 · 小学生创业模拟器</title>
 <style>
 /* ============ 基础变量 ============ */
 :root{
@@ -568,7 +568,7 @@ h1,h2,h3,h4,p{margin:0;}
     <div class="license">
       <div class="license-stamp">校园<br>创业<br>认证</div>
       <div class="license-kicker">营 业 执 照 / No.001</div>
-      <h1 class="title-main">董事长<br><span class="num">一年级</span></h1>
+      <h1 class="title-main">小学生<br><span class="num">玩耍公司</span></h1>
       <p class="title-sub">你是一个四年级学生。<br>你决定开一家公司，卖的不是文具，是「让学习变好玩」。</p>
       <div class="license-grid">
         <div class="lg-item"><b>经营者</b>你（四年级）</div>
@@ -680,7 +680,7 @@ h1,h2,h3,h4,p{margin:0;}
 
 <script>
 /* =========================================================
-   董事长一年级 —— 数据层
+   小学生玩耍公司 —— 数据层
    ========================================================= */
 
 const MODULES = [
@@ -2415,7 +2415,7 @@ function showEnding(){
 function copyResult(){
   const e = calcEnding();
   const ed = ENDINGS[e.id] || ENDINGS.normal;
-  const txt = '【董事长一年级】\n' + ed.title + '\n用户 ' + Math.round(S.users) + ' · 现金 ¥' + Math.round(S.cash) +
+  const txt = '【小学生玩耍公司】\n' + ed.title + '\n用户 ' + Math.round(S.users) + ' · 现金 ¥' + Math.round(S.cash) +
     ' · 口碑 ' + Math.round(S.rep) + ' · 士气 ' + Math.round(S.morale) +
     ' · 成绩 ' + Math.round(S.grade) + '\n公司：' + S.company + '（董事长 ' + S.ceo + '）';
   if(navigator.clipboard && navigator.clipboard.writeText){
