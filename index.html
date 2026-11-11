@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -572,7 +572,7 @@ h1,h2,h3,h4,p{margin:0;}
       <p class="title-sub">你是一个四年级学生。<br>你决定开一家公司，卖的不是文具，是「让学习变好玩」。</p>
       <div class="license-grid">
         <div class="lg-item"><b>经营者</b>你（四年级）</div>
-        <div class="lg-item"><b>注册资本</b>¥120（压岁钱）</div>
+        <div class="lg-item"><b>注册资本</b>¥150（压岁钱）</div>
         <div class="lg-item"><b>经营范围</b>学习软件 · 校园服务</div>
         <div class="lg-item"><b>经营期限</b>8 个星期</div>
       </div>
@@ -630,7 +630,7 @@ h1,h2,h3,h4,p{margin:0;}
   <div class="wrap" style="padding-top:28px;padding-bottom:40px">
     <div class="step-badge"><i>3</i> 组建创始团队</div>
     <h2 class="sec-title">公司不能只有你一个人</h2>
-    <p class="sec-desc">从 5 个同学里选 <b>3 个</b>。每人每周工资 ¥4，他们也有自己的小算盘。</p>
+    <p class="sec-desc">从 5 个同学里选 <b>3 个</b>。每人每周工资 ¥3，他们也有自己的小算盘。</p>
     <div class="hire-hint">
       <span>已签约 <b id="hireCount">0</b> / 3</span>
       <span style="opacity:.75">选中的同学会记住：是你给了他机会</span>
@@ -720,24 +720,24 @@ const SYNERGIES = [
 const CHANNELS = [
   {id:'class', name:'班级群', emoji:'💬', cost:0, reach:70, risk:0,
    desc:'在班级群里发个链接，全班都能看到。'},
-  {id:'grade', name:'年级海报', emoji:'🖨️', cost:15, reach:220, risk:1,
+  {id:'grade', name:'年级海报', emoji:'🖨️', cost:12, reach:220, risk:1,
    desc:'印 40 张海报贴满楼道。花点钱，人也更多。'},
-  {id:'parents', name:'家长群', emoji:'👨‍👩‍👧', cost:25, reach:340, risk:2,
+  {id:'parents', name:'家长群', emoji:'👨‍👩‍👧', cost:20, reach:340, risk:2,
    desc:'让爸妈帮忙转发。传播快，但家长会开始研究你。'},
-  {id:'gate', name:'校门口摆摊', emoji:'🏪', cost:40, reach:520, risk:3,
+  {id:'gate', name:'校门口摆摊', emoji:'🏪', cost:35, reach:520, risk:3,
    desc:'放学时摆个摊扫码送贴纸。人最多，也最容易被老师看见。'},
-  {id:'radio', name:'校园广播', emoji:'📢', cost:60, reach:820, risk:1,
-   desc:'花 60 块赞助一次广播。全校都听见你的广告。'}
+  {id:'radio', name:'校园广播', emoji:'📢', cost:50, reach:820, risk:1,
+   desc:'花 50 块赞助一次广播。全校都听见你的广告。'}
 ];
 
 const PRICES = {
   free:   {id:'free',   name:'完全免费',  icon:'🎁', amount:0, rate:0,    rep:0,
-           desc:'同学都爱，但一分钱也赚不到。'},
-  once:   {id:'once',   name:'1 元买断', icon:'🪙', amount:1, rate:0.30, rep:-2,
+           desc:'同学都爱。用户过 120 人，学校会给一点赞助。'},
+  once:   {id:'once',   name:'1 元买断', icon:'🪙', amount:1, rate:0.50, rep:-2,
            desc:'一根辣条的钱，一次付清。'},
-  member: {id:'member', name:'3 元/月会员', icon:'💳', amount:3, rate:0.10, rep:-4,
+  member: {id:'member', name:'3 元/月会员', icon:'💳', amount:3, rate:0.16, rep:-4,
            desc:'每月 3 元解锁全部功能。稳定，但会被说贵。'},
-  parent: {id:'parent', name:'6 元家长版', icon:'👨‍👩‍👦', amount:6, rate:0.05, rep:-3,
+  parent: {id:'parent', name:'6 元家长版', icon:'👨‍👩‍👦', amount:6, rate:0.08, rep:-3,
            desc:'家长买单，同学免费用。家长满意，但同学嫌你烦。'}
 };
 
@@ -1152,7 +1152,7 @@ function confetti(n=46){
 function newState(){
   return {
     ceo:'', company:'', week:1, maxWeek:8,
-    cash:120, users:0, rep:50, morale:62, grade:82, parent:72,
+    cash:150, users:0, rep:50, morale:62, grade:82, parent:72,
     research:0,
     team:[], modules:[], unlocked:[], price:'free', channel:'class',
     unlockedChannels:['class'],
@@ -1207,7 +1207,7 @@ function upkeep(){
   }, 0);
 }
 function salary(){
-  const per = 4 + (S.week >= 5 ? 1 : 0);
+  const per = 3 + (S.week >= 5 ? 1 : 0);
   return S.team.length * per;
 }
 function currentChannel(){
@@ -1216,7 +1216,7 @@ function currentChannel(){
 function forecastNewUsers(){
   const ch = currentChannel();
   if(!S.blocks.mkt) return 0;
-  const base = ch.reach * 0.15 * S.blocks.mkt;
+  const base = ch.reach * 0.20 * S.blocks.mkt;
   const f = (0.35 + productPower()/70) * (0.70 + S.rep/160) * (1 + teamSkill('net')*0.025);
   return Math.round(base * f);
 }
@@ -1225,8 +1225,9 @@ function forecastRevenue(){
   const price = PRICES[S.price];
   let rev = 0;
   if(S.price==='once') rev = Math.round(forecastNewUsers()*price.rate*price.amount);
-  if(S.price==='member') rev = Math.round(u*price.rate*price.amount);
-  if(S.price==='parent') rev = Math.round(u*price.rate*price.amount);
+  if(S.price==='member') rev = Math.round(u*price.rate*price.amount/4);
+  if(S.price==='parent') rev = Math.round(u*price.rate*price.amount/4);
+  if(S.price==='free' && u>=120) rev += Math.round(u*0.05);
   rev = Math.round(rev * (1 + (S.flags.revBonus||0)) * (1 - (S.flags.shareCut||0)));
   return rev;
 }
@@ -1611,8 +1612,9 @@ function renderMarket(){
     const sel = S.price === p.id;
     let revTxt = '预计收入 ¥0';
     if(p.id==='once') revTxt = '预计收入 ¥' + Math.round(expUsers*p.rate*p.amount);
-    if(p.id==='member') revTxt = '预计收入 ¥' + Math.round(S.users*p.rate*p.amount);
-    if(p.id==='parent') revTxt = '预计收入 ¥' + Math.round(S.users*p.rate*p.amount);
+    if(p.id==='member') revTxt = '预计收入 ¥' + Math.round(S.users*p.rate*p.amount/4);
+    if(p.id==='parent') revTxt = '预计收入 ¥' + Math.round(S.users*p.rate*p.amount/4);
+    if(p.id==='free') revTxt = S.users>=120 ? '学校赞助 ¥' + Math.round(S.users*0.05) : '用户过 120 人有赞助';
     return `
     <button class="price-card ${sel?'sel':''}" onclick="setPrice('${p.id}')">
       <div class="pc-top"><span>${p.icon}</span>${p.name}</div>
@@ -1651,7 +1653,7 @@ function renderMarket(){
       </div>
       <div class="price-grid">${priceCards}</div>
       <p style="font-size:10.5px;color:#777;font-weight:700;line-height:1.7;margin-top:10px">
-        ${S.price==='free' ? '现在完全免费。免费能换来用户和口碑，但账上不会多一分钱。' : '收费会带来现金流，但每收一次钱，口碑都会掉一点。'}
+        ${S.price==='free' ? '现在完全免费。用户过 120 人后，学校每周会给一点赞助——不多，刚好够发工资。' : '收费会带来现金流，但每收一次钱，口碑都会掉一点。'}
       </p>
     </div>
 
@@ -1837,7 +1839,7 @@ function renderPlan(){
       cast = n ? '+'+pts+' 研发点' : '—';
     }
     if(r.k==='mkt') cast = n ? '预计 +'+forecastNewUsers()+' 人' : '—';
-    if(r.k==='team') cast = n ? '士气 +'+Math.round(n*11-4) : '士气 -4';
+    if(r.k==='team') cast = n ? '士气 +'+Math.round(n*12-2) : '士气 -2';
     if(r.k==='study') cast = n ? '成绩 +'+Math.round(n*8-5) : '成绩 -5';
     return `
     <div class="block-row">
@@ -1964,11 +1966,11 @@ function resolveWeek(){
   const ch = currentChannel();
   let gain = 0;
   if(S.blocks.mkt > 0){
-    const base = ch.reach * 0.15 * S.blocks.mkt;
+    const base = ch.reach * 0.20 * S.blocks.mkt;
     const f = (0.35 + productPower()/70) * (0.70 + S.rep/160) * (1 + teamSkill('net')*0.025);
     gain = Math.round(base * f);
   }
-  const natural = Math.round(S.users * 0.05 * (S.rep/100) * (productPower()/50));
+  const natural = Math.round(S.users * 0.07 * (S.rep/100) * (productPower()/50));
   let gross = gain + natural;
   if(S.users >= ch.reach) gross = Math.round(gross * 0.15);
   const churnRate = 0.05 + Math.max(0,(55-S.rep))/300 + (S.users >= ch.reach ? 0.09 : 0);
@@ -1979,8 +1981,9 @@ function resolveWeek(){
   const p = PRICES[S.price];
   let rev = 0;
   if(S.price === 'once') rev = Math.round(gross * p.rate * p.amount);
-  if(S.price === 'member') rev = Math.round(S.users * p.rate * p.amount);
-  if(S.price === 'parent') rev = Math.round(S.users * p.rate * p.amount);
+  if(S.price === 'member') rev = Math.round(S.users * p.rate * p.amount / 4);
+  if(S.price === 'parent') rev = Math.round(S.users * p.rate * p.amount / 4);
+  if(S.price === 'free' && S.users >= 120) rev += Math.round(S.users * 0.05);   // 免费路线靠学校小额赞助
   rev = Math.round(rev * (1 + (S.flags.revBonus||0)) * (1 - (S.flags.shareCut||0)));
   const cost = salary() + upkeep();
   S.cash += rev - cost;
@@ -1991,11 +1994,11 @@ function resolveWeek(){
   S.grade = clamp(S.grade + gd, 0, 100);
 
   // ---- 5. 士气与忠诚 ----
-  let md = -4 + S.blocks.team*11;
+  let md = -2 + S.blocks.team*12;
   if(S.blocks.dev >= 3) md -= 7;
   S.team.forEach(m=>{
     if(needMet(m)) m.loyalty = clamp(m.loyalty + 1, 0, 100);
-    else { m.loyalty = clamp(m.loyalty - 2, 0, 100); md -= 2; }
+    else { m.loyalty = clamp(m.loyalty - 2, 0, 100); md -= 1; }
   });
   S.morale = clamp(S.morale + md, 0, 100);
 
@@ -2009,7 +2012,7 @@ function resolveWeek(){
 
   // ---- 7. 家长 ----
   let pd = 0;
-  if(S.price !== 'free') pd -= 3;
+  if(S.price !== 'free') pd -= 2;
   if(S.modules.includes('report')) pd += 5;
   if(S.blocks.study > 0) pd += 2; else pd -= 4;
   if(S.grade < 60) pd -= 6;
@@ -2340,12 +2343,12 @@ function closeBoard(){
 function calcEnding(){
   if(S.cash < -20) return {id:'bankrupt', fail:true};
   if(S.grade < 50) return {id:'grade', fail:true};
-  if(S.parent < 28) return {id:'mom', fail:true};
+  if(S.parent < 24) return {id:'mom', fail:true};
   if(S.morale < 18) return {id:'quit', fail:true};
-  if(S.users >= 260 && S.cash >= 160 && S.rep >= 68) return {id:'unicorn'};
-  if(S.rep >= 78 && S.users >= 100) return {id:'official'};
+  if(S.users >= 260 && S.cash >= 120 && S.rep >= 66) return {id:'unicorn'};
+  if(S.rep >= 74 && S.users >= 100) return {id:'official'};
   if(S.flags.annexed && S.rep >= 60) return {id:'official'};
-  if(S.morale >= 68 && S.users >= 50) return {id:'happy'};
+  if(S.morale >= 62 && S.users >= 50) return {id:'happy'};
   return {id:'normal'};
 }
 
@@ -2365,7 +2368,7 @@ const ENDINGS = {
   happy:{emoji:'🍭', kicker:'结局 · 快乐小作坊', title:'一个不大的公司',
     desc:'8 周结束，你的用户不算多，账上的钱也不多。但团队还在，每周五下午大家会一起在小卖部买点东西。<br><br>林小美在关于页面留了名字。张大壮还在跟三班较劲。王小胖说下学期想做个新功能。<br><br>这不是一个了不起的商业故事。但它是一个你愿意继续做下去的故事。<br><br><b>你学会的第六课：不是每家公司都要改变世界，有些公司只是让人开心。</b>'},
   normal:{emoji:'🎒', kicker:'结局 · 平稳结业', title:'一个普通的学期',
-    desc:'8 周过去了。你做成了一些事，也搞砸了一些事。用户不算多，钱基本没赚到，成绩勉强保住。<br><br>老师在评语里写：「该生思维活跃，但需要更专注。」你把这句话读了两遍，觉得她说得挺对。<br><br>公司还在，虽然小。下个学期要不要继续，你还没想好。<br><br><b>但你确定一件事：下次再开公司，你会更早开始想「钱从哪来」。</b>'}
+    desc:'8 周过去了。你做成了一些事，也搞砸了一些事。公司活下来了，成绩也守住了，只是走廊上还没多少人真的记住你们。<br><br>老师在评语里写：「该生思维活跃，但需要更专注。」你把这句话读了两遍，觉得她说得挺对。<br><br>公司还在，虽然小。下个学期要不要继续，你还没想好。<br><br><b>但你确定一件事：能活下来，也是一种本事。</b>'}
 };
 
 function showEnding(){
