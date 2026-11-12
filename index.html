@@ -651,6 +651,7 @@ h1,h2,h3,h4,p{margin:0;}
         <div class="hud-company" id="hudCompany">—</div>
         <div style="display:flex;gap:5px">
           <button class="icon-btn" onclick="toggleSound()" id="soundBtn" title="音效">🔊</button>
+          <button class="icon-btn" onclick="toggleVibrate()" id="vibBtn" title="震动">📳</button>
           <button class="icon-btn" onclick="openHelp()" title="帮助">?</button>
         </div>
       </div>
@@ -1093,30 +1094,82 @@ const chance = p => Math.random() < p;
 const esc = s => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const sum = arr => arr.reduce((a,b)=>a+b,0);
 
-let audioCtx = null, soundOn = true;
-function beep(freq=520, dur=.07, type='square', vol=.035){
+let audioCtx = null, soundOn = true, vibrateOn = true;
+let sfxCooldown = {};
+function beep(freq=520, dur=.07, type='square', vol=.035, id=''){
   if(!soundOn) return;
+  const now = performance.now();
+  if(id && sfxCooldown[id] && now - sfxCooldown[id] < 80) return;
+  sfxCooldown[id] = now;
   try{
     audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
     const o = audioCtx.createOscillator(), g = audioCtx.createGain();
     o.type = type; o.frequency.value = freq;
-    g.gain.value = vol;
+    g.gain.value = 0;
+    g.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + .005);
     o.connect(g); g.connect(audioCtx.destination);
     o.start();
-    g.gain.exponentialRampToValueAtTime(.0001, audioCtx.currentTime + dur);
-    o.stop(audioCtx.currentTime + dur + .01);
+    g.gain.exponentialRampToValueAtTime(.0005, audioCtx.currentTime + dur);
+    o.stop(audioCtx.currentTime + dur + .02);
   }catch(e){}
 }
-function sfxClick(){ beep(430,.04,'square',.025); }
-function sfxGood(){ beep(660,.06,'triangle',.04); setTimeout(()=>beep(880,.09,'triangle',.04),60); }
-function sfxBad(){ beep(180,.14,'sawtooth',.03); }
-function sfxCash(){ beep(880,.05,'sine',.045); setTimeout(()=>beep(1180,.07,'sine',.035),55); }
+function vibrate(pattern){
+  if(!vibrateOn) return;
+  try { if(typeof navigator.vibrate === 'function') navigator.vibrate(pattern); } catch(e) {}
+}
+function sfxClick(){ beep(430,.04,'square',.025,'c'); }
+function sfxGood(){ beep(660,.06,'triangle',.04,'g1'); setTimeout(()=>beep(880,.09,'triangle',.04,'g2'),60); }
+function sfxBad(){ beep(180,.14,'sawtooth',.03,'b'); vibrate(40); }
+function sfxCash(){ beep(880,.05,'sine',.045,'k1'); setTimeout(()=>beep(1180,.07,'sine',.035,'k2'),55); }
+function sfxInstall(){ beep(520,.05,'square',.03,'i1'); setTimeout(()=>beep(780,.07,'square',.03,'i2'),60); }
+function sfxUnlock(){ beep(300,.04,'triangle',.025,'u1'); setTimeout(()=>beep(460,.04,'triangle',.025,'u2'),45); setTimeout(()=>beep(700,.06,'triangle',.025,'u3'),90); }
+function sfxWeekEnd(){
+  // 下行音阶提示一周结束
+  [700,620,540,460].forEach((f,i)=>setTimeout(()=>beep(f,.1,'triangle',.035,'w'+i), i*70));
+  vibrate([30,30,30]);
+}
+function sfxReport(){
+  // 周报摘要 "叮咚"
+  beep(880,.06,'sine',.04,'r1'); setTimeout(()=>beep(1040,.09,'sine',.04,'r2'),70);
+}
+function sfxBoard(){
+  // 董事会：两声严肃低音
+  beep(240,.12,'square',.03,'bd1'); setTimeout(()=>beep(280,.14,'square',.03,'bd2'),90);
+  vibrate([50,40,50]);
+}
+function sfxVote(){
+  beep(600,.05,'triangle',.035,'v1'); setTimeout(()=>beep(900,.08,'triangle',.035,'v2'),60);
+}
+function sfxEvent(){
+  // 突发事件：急促鼓点
+  beep(200,.08,'sawtooth',.035,'e1'); setTimeout(()=>beep(160,.1,'sawtooth',.035,'e2'),90);
+  vibrate([60,50,60]);
+}
+function sfxEndingWin(){
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.16,'triangle',.045,'w'+i), i*110));
+  vibrate([40,40,40,40,60,60,60]);
+}
+function sfxEndingLose(){
+  [440,370,311,220].forEach((f,i)=>setTimeout(()=>beep(f,.2,'sawtooth',.035,'l'+i), i*140));
+  vibrate([80,60,80]);
+}
+function sfxFail(){
+  beep(300,.16,'sawtooth',.045,'f1'); setTimeout(()=>beep(200,.22,'sawtooth',.045,'f2'),110);
+  vibrate([100,80,100]);
+}
 
 function toggleSound(){
   soundOn = !soundOn;
   $('soundBtn').textContent = soundOn ? '🔊' : '🔇';
-  if(soundOn) sfxClick();
-  save();
+  if(soundOn){ sfxClick(); vibrate(20); }
+  if(S){ S.sound = soundOn; save(); }
+}
+function toggleVibrate(){
+  vibrateOn = !vibrateOn;
+  $('vibBtn').textContent = vibrateOn ? '📳' : '🚫';
+  if(vibrateOn) vibrate(25);
+  if(S){ S.vibrate = vibrateOn; save(); }
 }
 
 function toast(msg, type=''){
@@ -1157,7 +1210,7 @@ function newState(){
     team:[], modules:[], unlocked:[], price:'free', channel:'class',
     unlockedChannels:['class'],
     blocks:{dev:1, mkt:1, team:1, study:1},
-    talked:false, log:[], seenEvents:[], flags:{}, sound:soundOn
+    talked:false, log:[], seenEvents:[], flags:{}, sound:soundOn, vibrate:vibrateOn
   };
 }
 
@@ -1270,7 +1323,9 @@ function continueGame(){
   if(!d){ toast('没有找到存档'); return; }
   S = d;
   soundOn = S.sound !== false;
+  vibrateOn = S.vibrate !== false;
   $('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  $('vibBtn').textContent = vibrateOn ? '📳' : '🚫';
   showScreen('s-game');
   renderAll();
   toast('欢迎回来，董事长', 'good');
@@ -1402,6 +1457,7 @@ function renderAll(){
   renderTab();
   renderFooter();
   $('soundBtn').textContent = soundOn ? '🔊' : '🔇';
+  $('vibBtn').textContent = vibrateOn ? '📳' : '🚫';
 }
 
 const HUD_LAST = {};
@@ -1575,7 +1631,7 @@ function researchModule(id){
   S.unlocked.push(id);
   pushLog('研发完成：'+m.name+'。');
   toast('研发成功：'+m.name, 'good');
-  sfxGood();
+  sfxUnlock();
   save(); renderAll();
 }
 
@@ -1588,7 +1644,7 @@ function installModule(id, silent){
   if(!silent){
     pushLog('把「'+m.name+'」装进了产品。');
     toast('已装上：'+m.name, 'good');
-    sfxClick();
+    sfxInstall();
   }
   save(); renderAll();
 }
@@ -1949,7 +2005,7 @@ function endWeek(){
 }
 
 function resolveWeek(){
-  sfxClick();
+  sfxWeekEnd();
   // ---- 1. 研发 ----
   let devPts = Math.round(S.blocks.dev * 8 * (1 + teamSkill('tech')*0.04 + (S.flags.devBonus||0)));
   if(devPts > 0 && hasMember('wang') && S.blocks.dev >= 2 && chance(.25)){
@@ -2061,6 +2117,7 @@ function maybeEvent(cb){
 
 /* ---------------- 事件 ---------------- */
 function showEvent(ev, cb){
+  sfxEvent();
   UI.pendingEvent = {ev, cb};
   const choices = ev.choices.map((c,i)=>`
     <button class="choice ${c.cls||''}" onclick="pickChoice(${i})">
@@ -2140,6 +2197,7 @@ function diaryLines(){
 }
 
 function showReport(){
+  sfxReport();
   const s = UI.snap;
   const rows = [
     deltaRow('用户','👥', s.users, S.users, ' 人'),
@@ -2196,6 +2254,7 @@ function advance(){
 
 /* ---------------- 董事会投票 ---------------- */
 function showBoard(){
+  sfxBoard();
   const topicId = S.week === 2 ? 'price' : (S.week === 4 ? 'cheat' : 'expo');
   UI.board = {topic: TOPICS[topicId], stance:null, flipped:{}, persuaded:false};
   renderBoard();
@@ -2282,6 +2341,7 @@ function persuade(id){
 }
 
 function castVote(){
+  sfxVote();
   const b = UI.board;
   if(!b.stance){ toast('先选一个你的立场'); return; }
   let a = 0, bb = 0;
@@ -2381,6 +2441,8 @@ function showEnding(){
     return `<span class="badge ${on?'':'off'}">${b.emoji} ${b.name}</span>`;
   }).join('');
   const wasFail = !!e.fail;
+  if(wasFail) sfxEndingLose(); else sfxEndingWin();
+  if(wasFail){ vibrate([100,80,100,80,120]); }
   openModal(`
     <div class="modal-stripe"></div>
     <div class="modal-body">
